@@ -1,0 +1,71 @@
+{
+    "version": 3, 
+    "configurePresets": [
+        {
+            
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "Debug build",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/debug",
+            "installDir": "${sourceDir}/output/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD_COMPONENT": "deploy"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "description": "Release build",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/release",
+            "installDir": "${sourceDir}/output/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "BUILD_COMPONENT": "deploy"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        },
+        {
+            "name": "test",
+            "displayName": "Test",
+            "description": "Tests (unit)",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/test",
+            "installDir": "${sourceDir}/output/test",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD_COMPONENT": "test"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "debug",
+            "description": "Debug"
+        },
+        {
+            "name": "Release",
+            "configurePreset": "release",
+            "description": "Release"
+        },
+        {
+            "name": "Test",
+            "configurePreset": "test",
+            "description": "Test"
+        }
+    ]
+}
