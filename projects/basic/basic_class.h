@@ -1,4 +1,4 @@
-#include <boost_serialization_helper.h>
+#include <serializable.h>
 
 struct Basic_AllMembersSerialized {
     SERIALIZABLE int m_a = 1;

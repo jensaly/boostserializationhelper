@@ -52,7 +52,7 @@
         },
         {
             "name": "test_tool",
-            "displayName": "Test the tool",
+            "displayName": "Test tool",
             "description": "Run unit tests on the tool",
             "hidden": false,
             "binaryDir": "${sourceDir}/build/test_tool",
