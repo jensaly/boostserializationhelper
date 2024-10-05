@@ -22,19 +22,19 @@ find_package(Boost 1.74.0 QUIET COMPONENTS serialization)
 include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_subdirectory(projects)
-
-set(TEST_PROJECT_SOURCES main.cpp)
-
-set(TEST_PROJECT_HEADERS)
+cmake_minimum_required(VERSION 3.10)
+project(StaticAnalysisTestSuite)
 
 include(GoogleTest)
 
-add_executable(all_test_projects ${TEST_PROJECT_SOURCES} ${TEST_PROJECT_HEADERS})
-target_link_libraries(all_test_projects gtest gtest_main)
+# Add subdirectories for each test project
+add_subdirectory(projects)
+add_subdirectory(utils)
 
-gtest_discover_tests(all_test_projects)
+add_executable(test_all test_all.cpp)
 
-install(TARGETS all_test_projects
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+# Link with all the test libraries
+target_link_libraries(test_all basic gtest gtest_main)
+target_include_directories(test_all PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/projects/basic ${CMAKE_CURRENT_SOURCE_DIR}/projects/complex)
+
+gtest_discover_tests(test_all basic_tests)
