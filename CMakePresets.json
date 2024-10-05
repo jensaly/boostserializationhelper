@@ -35,15 +35,31 @@
             }
         },
         {
-            "name": "test",
-            "displayName": "Test",
-            "description": "Tests (unit)",
+            "name": "test_projects",
+            "displayName": "Test Projects",
+            "description": "Run unit tests on the test projects",
             "hidden": false,
-            "binaryDir": "${sourceDir}/build/test",
-            "installDir": "${sourceDir}/output/test",
+            "binaryDir": "${sourceDir}/build/test_projects",
+            "installDir": "${sourceDir}/output/test_projects",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "BUILD_COMPONENT": "test"
+                "BUILD_COMPONENT": "test_projects"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        },
+        {
+            "name": "test_tool",
+            "displayName": "Test the tool",
+            "description": "Run unit tests on the tool",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/test_tool",
+            "installDir": "${sourceDir}/output/test_tool",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD_COMPONENT": "test_tool"
             },
             "architecture": {
                 "value": "x64",
@@ -63,9 +79,14 @@
             "description": "Release"
         },
         {
-            "name": "Test",
-            "configurePreset": "test",
-            "description": "Test"
+            "name": "Test Projects",
+            "configurePreset": "test_projects",
+            "description": "Run test project tests"
+        },
+        {
+            "name": "Test Tool",
+            "configurePreset": "test_tool",
+            "description": "Run tests on tool"
         }
     ]
 }

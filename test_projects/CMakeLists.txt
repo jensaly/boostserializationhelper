@@ -12,21 +12,29 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+set(Boost_DEBUG 1)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+find_package(Boost 1.74.0 QUIET COMPONENTS serialization)
+
 include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 
-set(SLAVE_TEST_SOURCES main.cpp)
+add_subdirectory(projects)
 
-set(SLAVE_TEST_HEADERS)
+set(TEST_PROJECT_SOURCES main.cpp)
+
+set(TEST_PROJECT_HEADERS)
 
 include(GoogleTest)
 
-find_package(Qt6 COMPONENTS Test REQUIRED)
+add_executable(all_test_projects ${TEST_PROJECT_SOURCES} ${TEST_PROJECT_HEADERS})
+target_link_libraries(all_test_projects gtest gtest_main)
 
-add_executable(sh_test ${SLAVE_TEST_SOURCES} ${SLAVE_TEST_HEADERS})
-target_link_libraries(sh_test gtest gtest_main)
+gtest_discover_tests(all_test_projects)
 
-gtest_discover_tests(sh_test)
-
-install(TARGETS sh_test
+install(TARGETS all_test_projects
     RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}
 )

@@ -1,8 +1,8 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(HEADERS)
+set(HEADERS boost_serialization_helper.h visitor.h)
 
-set(SOURCES basic.cpp)
+set(SOURCES)
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})
 
