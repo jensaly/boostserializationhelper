@@ -6,15 +6,32 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/raw_ostream.h"
 
-class FindSerializableClassAction : clang::ASTFrontendAction {
-    virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
-    return std::make_unique<FindSerializableClass>();
+using namespace clang;
+
+class FindSerializabledClassVisitor
+  : public clang::RecursiveASTVisitor<FindSerializabledClassVisitor> {
+public:
+  explicit FindSerializabledClassVisitor(ASTContext *Context)
+    : Context(Context) {}
+
+  bool VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
+    if (Declaration->getQualifiedNameAsString() == "n::m::C") {
+      FullSourceLoc FullLocation = Context->getFullLoc(Declaration->getBeginLoc());
+      if (FullLocation.isValid())
+        llvm::outs() << "Found declaration at "
+                     << FullLocation.getSpellingLineNumber() << ":"
+                     << FullLocation.getSpellingColumnNumber() << "\n";
+    }
+    return true;
   }
-}
+private:
+  ASTContext *Context;
+};
 
 class FindSerializableClassConsumer : public clang::ASTConsumer {
 public:
+  explicit FindSerializableClassConsumer(clang::ASTContext *Context)
+    : Visitor(Context) {}
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     // Traversing the translation unit decl via a RecursiveASTVisitor
     // will visit all nodes in the AST.
@@ -22,19 +39,12 @@ public:
   }
 private:
   // A RecursiveASTVisitor implementation.
-  FindNamedClassVisitor Visitor;
+  FindSerializabledClassVisitor Visitor;
 };
 
-class FindNamedClassVisitor
-  : public RecursiveASTVisitor<FindNamedClassVisitor> {
-public:
-  bool VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
-    // For debugging, dumping the AST nodes will show which nodes are already
-    // being visited.
-    Declaration->dump();
-
-    // The return value indicates whether we want the visitation to proceed.
-    // Return false to stop the traversal of the AST.
-    return true;
+class FindSerializableClassAction : clang::ASTFrontendAction {
+    virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+        clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
+    return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
   }
 };
