@@ -88,5 +88,27 @@
             "configurePreset": "test_tool",
             "description": "Run tests on tool"
         }
+    ],
+    "testPresets": [
+        {
+            "name": "Debug",
+            "configurePreset": "debug",
+            "description": "Debug"
+        },
+        {
+            "name": "Release",
+            "configurePreset": "release",
+            "description": "Release"
+        },
+        {
+            "name": "Test Projects",
+            "configurePreset": "test_projects",
+            "description": "Run test project tests"
+        },
+        {
+            "name": "Test Tool",
+            "configurePreset": "test_tool",
+            "description": "Run tests on tool"
+        }
     ]
 }

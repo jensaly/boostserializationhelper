@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Run tests",
+            "program": "${workspaceRoot}/output/test_tool/test_main",
+            "args": [],
+            "cwd": "${workspaceRoot}/output/test_tool/",
+            //"stopAtEntry": false,
+            //"externalConsole": true,
+            //"preLaunchTask": "Build Debug"
+
+        }
+    ]
+}

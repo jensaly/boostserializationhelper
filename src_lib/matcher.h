@@ -15,6 +15,15 @@ public:
     : Context(Context) {}
 
   bool VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
+    for (auto method : Declaration->methods()) {
+      if (method->getNameAsString() == "serialize") {
+        llvm::outs() << Declaration->getNameAsString() << " has serialize method";
+        return true;
+      }
+    }
+    return true;
+
+    /*
     if (Declaration->getQualifiedNameAsString() == "n::m::C") {
       FullSourceLoc FullLocation = Context->getFullLoc(Declaration->getBeginLoc());
       if (FullLocation.isValid())
@@ -22,6 +31,7 @@ public:
                      << FullLocation.getSpellingLineNumber() << ":"
                      << FullLocation.getSpellingColumnNumber() << "\n";
     }
+    */
     return true;
   }
 private:
@@ -32,9 +42,8 @@ class FindSerializableClassConsumer : public clang::ASTConsumer {
 public:
   explicit FindSerializableClassConsumer(clang::ASTContext *Context)
     : Visitor(Context) {}
+
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
-    // Traversing the translation unit decl via a RecursiveASTVisitor
-    // will visit all nodes in the AST.
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());
   }
 private:
@@ -42,9 +51,10 @@ private:
   FindSerializabledClassVisitor Visitor;
 };
 
-class FindSerializableClassAction : clang::ASTFrontendAction {
-    virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
+class FindSerializableClassAction : public clang::ASTFrontendAction {
+public:
+  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+    clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
   }
 };

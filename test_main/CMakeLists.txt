@@ -27,3 +27,5 @@ target_include_directories(test_main PUBLIC ${CMAKE_SOURCE_DIR}/projects ${CMAKE
 gtest_discover_tests(test_main)
 
 file(COPY ${CMAKE_SOURCE_DIR}/projects DESTINATION ${CMAKE_INSTALL_PREFIX}/projects)
+
+install(TARGETS test_main DESTINATION ${CMAKE_INSTALL_PREFIX})
