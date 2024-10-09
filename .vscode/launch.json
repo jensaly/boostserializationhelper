@@ -15,6 +15,18 @@
             //"externalConsole": true,
             //"preLaunchTask": "Build Debug"
 
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Run project tests",
+            "program": "${workspaceRoot}/output/test_projects/test_all",
+            "args": [],
+            "cwd": "${workspaceRoot}/output/test_projects/",
+            //"stopAtEntry": false,
+            //"externalConsole": true,
+            //"preLaunchTask": "Build Debug"
+
         }
     ]
 }

@@ -35,3 +35,5 @@ target_link_libraries(test_all basic test_utils gtest gtest_main ${Boost_LIBRARI
 target_include_directories(test_all PUBLIC ${CMAKE_SOURCE_DIR}/projects/basic ${CMAKE_SOURCE_DIR}/projects/complex utils)
 
 gtest_discover_tests(test_all)
+
+install(TARGETS test_all DESTINATION ${CMAKE_INSTALL_PREFIX})

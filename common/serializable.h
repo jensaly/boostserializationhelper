@@ -1,1 +1,1 @@
-#define SERIALIZABLE __attribute__((annotate("serializable")))
+#define SERIALIZABLE [[clang::annotate("serializable")]]

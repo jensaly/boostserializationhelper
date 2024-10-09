@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <basic/basic_class.h>
+#include <basic/basic_class.hpp>
 #include <matcher.h>
 #include <fstream>
 #include <sstream>
@@ -20,10 +20,9 @@ std::string GetCodeFromSourceFile(const std::string& filepath) {
 }
 
 TEST(SH_BasicProject_Tests, BasicAnalysis) {
-    // You would load files from project1 here and analyze them
-    std::string file = "./projects/basic/basic_class.h";
+    std::string file = "./projects/basic/basic_class.hpp";
     std::string code = GetCodeFromSourceFile(file);
-    std::vector<std::string> args{"-fsyntax-only"};
+    std::vector<std::string> args{"-fsyntax-only", "-I/home/jens/Documents/repos/serialization_helper/common", "-x", "c++"};
 
-    clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file);
+    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 }
