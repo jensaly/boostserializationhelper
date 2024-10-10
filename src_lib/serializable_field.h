@@ -8,30 +8,20 @@
 
 using namespace clang;
 
-class FindSerializabledClassVisitor
-  : public clang::RecursiveASTVisitor<FindSerializabledClassVisitor> {
+class FindSerializableFieldsVisitor
+  : public clang::RecursiveASTVisitor<FindSerializableFieldsVisitor> {
 public:
-  explicit FindSerializabledClassVisitor(ASTContext *Context)
+  explicit FindSerializableFieldsVisitor(ASTContext *Context)
     : Context(Context) {}
 
   bool VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
-    for (auto method : Declaration->methods()) {
-      if (method->getNameAsString() == "serialize") {
-        llvm::outs() << Declaration->getNameAsString() << " has serialize method";
-        return true;
+    for (auto field : Declaration->fields()) {
+      if (field->hasAttr<AnnotateAttr>()) {
+        llvm::outs() <<field->getAttr<AnnotateAttr>()->getAnnotation() << "\n";
       }
+      llvm::outs() << field->getNameAsString() << "\n";
+      
     }
-    return true;
-
-    /*
-    if (Declaration->getQualifiedNameAsString() == "n::m::C") {
-      FullSourceLoc FullLocation = Context->getFullLoc(Declaration->getBeginLoc());
-      if (FullLocation.isValid())
-        llvm::outs() << "Found declaration at "
-                     << FullLocation.getSpellingLineNumber() << ":"
-                     << FullLocation.getSpellingColumnNumber() << "\n";
-    }
-    */
     return true;
   }
 private:
@@ -48,7 +38,7 @@ public:
   }
 private:
   // A RecursiveASTVisitor implementation.
-  FindSerializabledClassVisitor Visitor;
+  FindSerializableFieldsVisitor Visitor;
 };
 
 class FindSerializableClassAction : public clang::ASTFrontendAction {

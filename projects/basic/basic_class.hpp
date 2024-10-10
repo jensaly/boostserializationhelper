@@ -1,6 +1,6 @@
 #include <serializable.h>
 
-struct Basic_AllMembersSerialized {
+struct SERIALIZABLE Basic_AllMembersSerialized {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
@@ -17,7 +17,7 @@ struct Basic_AllMembersSerialized {
     }
 };
 
-struct Basic_OneMemberNotSerialized {
+struct SERIALIZABLE Basic_OneMemberNotSerialized {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     char m_c = 'c';
@@ -34,7 +34,7 @@ struct Basic_OneMemberNotSerialized {
     }
 };
 
-struct Basic_TaggedMemberNotSerialized {
+struct SERIALIZABLE Basic_TaggedMemberNotSerialized {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     char m_c = 'c';
@@ -49,7 +49,7 @@ struct Basic_TaggedMemberNotSerialized {
     }
 };
 
-struct Basic_UntaggedMemberSeralized {
+struct SERIALIZABLE Basic_UntaggedMemberSeralized {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     char m_c = 'c';

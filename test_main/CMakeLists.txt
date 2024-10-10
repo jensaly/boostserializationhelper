@@ -26,6 +26,22 @@ target_include_directories(test_main PUBLIC ${CMAKE_SOURCE_DIR}/projects ${CMAKE
 
 gtest_discover_tests(test_main)
 
-file(COPY ${CMAKE_SOURCE_DIR}/projects DESTINATION ${CMAKE_INSTALL_PREFIX}/projects)
+# Recursively get all .cpp and .hpp files
+file(GLOB_RECURSE source_files
+    ${CMAKE_SOURCE_DIR}/projects/*.cpp
+    ${CMAKE_SOURCE_DIR}/projects/*.hpp
+)
+
+# Install each file, preserving the folder structure
+foreach(file ${source_files})
+    # Get the relative path by stripping the source directory prefix
+    file(RELATIVE_PATH rel_path ${CMAKE_SOURCE_DIR}/projects ${file})
+
+    # Extract the directory part of the relative path
+    get_filename_component(dir ${rel_path} DIRECTORY)
+
+    # Install the file, ensuring the correct directory structure is preserved
+    install(FILES ${file} DESTINATION ${CMAKE_INSTALL_PREFIX}/projects/${dir})
+endforeach()
 
 install(TARGETS test_main DESTINATION ${CMAKE_INSTALL_PREFIX})
