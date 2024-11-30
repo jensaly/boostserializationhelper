@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/jens/Documents/repos/serialization_helper/build/src_lib",
+  "command": "/usr/bin/clang++  -I/home/jens/Documents/repos/serialization_helper/build/src_lib -I/home/jens/Documents/repos/serialization_helper/src_lib -I/usr/lib/llvm-14/include -I/usr/lib/llvm-14/lib -g -std=gnu++20 -o CMakeFiles/sh_lib.dir/basic.cpp.o -c /home/jens/Documents/repos/serialization_helper/src_lib/basic.cpp",
+  "file": "/home/jens/Documents/repos/serialization_helper/src_lib/basic.cpp"
+}
+]

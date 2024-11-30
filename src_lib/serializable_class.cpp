@@ -1,0 +1,49 @@
+#include "serializable_class.h"
+
+FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
+    : Context(Context) {
+    
+}
+
+/// @brief 
+/// @param Declaration 
+/// @return true indicates that iteration through the translation unit shall continue
+bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
+    auto name = Declaration->getNameAsString();
+    if (!isClassSerializable(Declaration)) {
+        return true;
+    }
+    SerializableCXXRecordDeclStorage::decls.push_back(Declaration);
+    /*
+    for (auto field : Declaration->fields()) {
+        if (field->hasAttr<AnnotateAttr>()) {
+        llvm::outs() <<field->getAttr<AnnotateAttr>()->getAnnotation() << "\n";
+        }
+        llvm::outs() << field->getNameAsString() << "\n";
+    }
+    */
+    return true;
+}
+
+bool FindSerializableClassVisitor::isClassSerializable(CXXRecordDecl *declaration) {
+    if (!declaration->hasAttr<AnnotateAttr>()) {
+        return false;
+    }
+
+    auto attr = declaration->getAttr<AnnotateAttr>();
+
+    return attr->getAnnotation() == "serializable";
+}
+
+FindSerializableClassConsumer::FindSerializableClassConsumer(clang::ASTContext *Context) : Visitor(Context) {
+
+}
+
+void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Context) {
+    Visitor.TraverseDecl(Context.getTranslationUnitDecl());    
+}
+
+std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(
+    clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
+    return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
+}

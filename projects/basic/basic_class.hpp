@@ -1,5 +1,25 @@
 #include <serializable.h>
 
+struct Basic_NotSerialized {
+    int m_a = 1;
+    float m_b = 1.;
+    char m_c = 'c';
+
+    Basic_NotSerialized(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    Basic_NotSerialized() = default;
+};
+
+struct SERIALIZABLE Basic_SerializableWithoutFunction {
+    int m_a = 1;
+    float m_b = 1.;
+    char m_c = 'c';
+
+    Basic_SerializableWithoutFunction(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    Basic_SerializableWithoutFunction() = default;
+};
+
 struct SERIALIZABLE Basic_AllMembersSerialized {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;

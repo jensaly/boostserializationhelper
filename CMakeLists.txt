@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
 message(STATUS "Compiler:                    ${CMAKE_CXX_COMPILER_ID}" )
 message(STATUS "Build type:                  ${CMAKE_BUILD_TYPE}")
 message(STATUS "Binary dir:                  ${CMAKE_BINARY_DIR}")

@@ -24,6 +24,8 @@ target_link_libraries(test_main basic sh_lib gtest gtest_main sh_lib common)
 
 target_include_directories(test_main PUBLIC ${CMAKE_SOURCE_DIR}/projects ${CMAKE_SOURCE_DIR}/src_lib ${CMAKE_SOURCE_DIR}/common)
 
+target_compile_options(test_main PRIVATE -fno-limit-debug-info)
+
 gtest_discover_tests(test_main)
 
 # Recursively get all .cpp and .hpp files

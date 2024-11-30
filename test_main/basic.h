@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <basic/basic_class.hpp>
-#include <matcher.h>
+#include <serializable_class.h>
 #include <fstream>
 #include <sstream>
 
@@ -25,4 +25,12 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     std::vector<std::string> args{"-fsyntax-only", "-I/home/jens/Documents/repos/serialization_helper/common", "-x", "c++"};
 
     ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+
+    auto serializable_classes = SerializableCXXRecordDeclStorage::GetClasses();
+
+    ASSERT_EQ(serializable_classes.size(), 5);
+
+    for (auto& serializable_class : serializable_classes) {
+        
+    }
 }
