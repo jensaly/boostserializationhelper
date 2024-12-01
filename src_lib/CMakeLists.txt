@@ -1,6 +1,6 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(HEADERS serializable_class.h serializable_class_storage.h)
+set(HEADERS serializable_class.h serializable_class_storage.h warnings.h)
 
 set(SOURCES serializable_class.cpp serializable_class_storage.cpp)
 

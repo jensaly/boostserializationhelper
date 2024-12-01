@@ -14,14 +14,13 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         return true;
     }
     SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration);
-    /*
+
     for (auto field : Declaration->fields()) {
         if (field->hasAttr<AnnotateAttr>()) {
         llvm::outs() <<field->getAttr<AnnotateAttr>()->getAnnotation() << "\n";
         }
         llvm::outs() << field->getNameAsString() << "\n";
     }
-    */
     return true;
 }
 
@@ -46,4 +45,20 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(
     clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
+}
+
+bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
+    if (op->getOpcode() == BO_And) {
+        const Expr* lhs = op->getLHS();
+        const Expr* rhs = op->getRHS();
+        
+        if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
+            m_serializeContents.push_back(rhs_decl->getMemberDecl()->getNameAsString());
+        }
+    }
+    return true;
+}
+
+const std::vector<std::string> SerializableStmtVisitor::GetSerializeContents() {
+    return m_serializeContents;
 }

@@ -34,6 +34,8 @@ file(GLOB_RECURSE source_files
     ${CMAKE_SOURCE_DIR}/projects/*.hpp
 )
 
+add_compile_definitions(COMMON_DIR="${CMAKE_SOURCE_DIR}/common")
+
 # Install each file, preserving the folder structure
 foreach(file ${source_files})
     # Get the relative path by stripping the source directory prefix

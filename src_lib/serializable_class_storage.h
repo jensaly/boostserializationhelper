@@ -4,7 +4,6 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
-#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 
@@ -15,30 +14,18 @@ class SerializableClassInfo {
 
 class SerializableCXXRecordDeclStorage {
 public:
-    static bool AddSerializableDecl(CXXRecordDecl* serializable) {
-        serializables.push_back(serializable);
-        return true;
-    }
+    static bool AddSerializableDecl(CXXRecordDecl* serializable);
 
-    static const std::vector<CXXRecordDecl*>& GetClasses() {
-        return serializables;
-    }
+    static const std::vector<CXXRecordDecl*>& GetClasses();
 private:
     static std::vector<CXXRecordDecl*> serializables;
 };
 
 class SerializableInClassAnalyzer {
 public:
-    static bool hasSerializeMethod(const CXXRecordDecl* serializable) {
-        // TODO: Find non-intrusive definition serialize
-        // TODO: Check if split_member
-
-        auto it = std::find_if(serializable->method_begin(), serializable->method_end(), [&](const auto* method){
-            return method->getNameAsString() == "serialize";
-        });
-        if (it == serializable->method_end()) {
-            return false;
-        }
-        return true;
-    }
+    static bool hasSerializeMethod(const CXXRecordDecl* serializable);
+    static FunctionTemplateDecl* getSerializeMethod(const CXXRecordDecl* serializable);
+    static bool checkAllSerializeableInSerialize(const FunctionTemplateDecl* serialize_function, const CXXRecordDecl* serializable);
+    static std::vector<std::string> getSerializableMembers(const CXXRecordDecl* serializable);
+    static std::vector<std::string> getSerializableMembers(const FunctionTemplateDecl* serialize_function);
 };

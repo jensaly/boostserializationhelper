@@ -33,3 +33,11 @@ class FindSerializableClassAction : public clang::ASTFrontendAction {
 public:
   virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
 };
+
+// Visitor for the Stmt of serialize functions
+class SerializableStmtVisitor : public clang::RecursiveASTVisitor<SerializableStmtVisitor> {
+  std::vector<std::string> m_serializeContents;
+public:
+  bool VisitBinaryOperator(const BinaryOperator *op);
+  const std::vector<std::string> GetSerializeContents();
+};
