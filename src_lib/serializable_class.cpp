@@ -13,7 +13,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     if (!isClassSerializable(Declaration)) {
         return true;
     }
-    SerializableCXXRecordDeclStorage::decls.push_back(Declaration);
+    SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration);
     /*
     for (auto field : Declaration->fields()) {
         if (field->hasAttr<AnnotateAttr>()) {
