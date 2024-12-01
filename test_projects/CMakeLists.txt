@@ -32,7 +32,7 @@ add_subdirectory(utils)
 add_executable(test_all test_all.cpp test_basic_project.cpp test_complex_project.cpp)
 
 target_link_libraries(test_all basic test_utils gtest gtest_main ${Boost_LIBRARIES})
-target_include_directories(test_all PUBLIC ${CMAKE_SOURCE_DIR}/projects/basic ${CMAKE_SOURCE_DIR}/projects/complex utils)
+target_include_directories(test_all SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/projects/basic ${CMAKE_SOURCE_DIR}/projects/complex utils)
 
 gtest_discover_tests(test_all)
 
