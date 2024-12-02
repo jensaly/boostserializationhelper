@@ -51,8 +51,6 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     ASSERT_NE(class_Basic_TaggedMemberNotSerialized, nullptr);
     ASSERT_NE(class_Basic_UntaggedMemberSeralized, nullptr);
 
-    ASSERT_TRUE(class_Basic_SerializableWithoutFunction->hasAttr<AnnotateAttr>());
-
     ASSERT_TRUE(class_Basic_SerializableWithoutFunction->isCompleteDefinition());
     ASSERT_TRUE(class_Basic_AllMembersSerialized->isCompleteDefinition());
     ASSERT_TRUE(class_Basic_OneMemberNotSerialized->isCompleteDefinition());

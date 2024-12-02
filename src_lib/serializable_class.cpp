@@ -13,7 +13,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     if (!isClassSerializable(Declaration)) {
         return true;
     }
-    Declaration->getDeclContext()
+    
     if (Declaration->isCompleteDefinition())
         SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration->getCanonicalDecl());
     /*
@@ -46,7 +46,11 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
 }
 
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
-    return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
+    auto ptr = std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
+
+    llvm::outs() << ((SerializableCXXRecordDeclStorage::GetClasses()[0], "Basic_SerializableWithoutFunction") ? "HasAnnotation" : "HasNotAnnotation");
+
+    return std::move(ptr);
 }
 
 bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
