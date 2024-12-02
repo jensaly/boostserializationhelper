@@ -13,14 +13,17 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     if (!isClassSerializable(Declaration)) {
         return true;
     }
-    SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration);
-
+    Declaration->getDeclContext()
+    if (Declaration->isCompleteDefinition())
+        SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration->getCanonicalDecl());
+    /*
     for (auto field : Declaration->fields()) {
         if (field->hasAttr<AnnotateAttr>()) {
         llvm::outs() <<field->getAttr<AnnotateAttr>()->getAnnotation() << "\n";
         }
         llvm::outs() << field->getNameAsString() << "\n";
     }
+    */
     return true;
 }
 
@@ -42,8 +45,7 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
     Visitor.TraverseDecl(Context.getTranslationUnitDecl());    
 }
 
-std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(
-    clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
+std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     return std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
 }
 

@@ -35,12 +35,13 @@ FunctionTemplateDecl* SerializableInClassAnalyzer::getSerializeMethod(const CXXR
     return nullptr;
 }
 
-std::vector<std::string> SerializableInClassAnalyzer::getSerializableMembers(const CXXRecordDecl* serializable) {
+std::vector<std::string> SerializableInClassAnalyzer::getSerializableMembers(const CXXRecordDecl* serializable1) {
     std::vector<std::string> serializable_members;
-
-    if (!serializable->hasDefinition()) {
+    if (!serializable1->hasDefinition()) {
         return serializable_members;
     }
+
+    auto serializable = serializable1->getCanonicalDecl();
 
     llvm::outs() << "Class/Struct: " << serializable->getNameAsString();
 
