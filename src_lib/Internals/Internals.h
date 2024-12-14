@@ -5,7 +5,7 @@
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/raw_ostream.h"
-#include "serializable_class_storage.h"
+#include <SerializableClassInfoAggregator.h>
 
 using namespace clang;
 

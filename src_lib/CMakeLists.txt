@@ -1,8 +1,17 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(HEADERS serializable_class.h serializable_class_storage.h warnings.h)
+set(HEADERS 
+        Internals/Internals.h
+        SerializableClassInfoAggregator.h
+        PostProcessing/SerializationErrors.h
+        PostProcessing/SerializableClassInfo.h
+    )
 
-set(SOURCES serializable_class.cpp serializable_class_storage.cpp)
+set(SOURCES
+        Internals/Internals.cpp
+        SerializableClassInfoAggregator.cpp
+        PostProcessing/SerializableClassInfo.cpp
+    )
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})
 

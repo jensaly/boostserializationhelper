@@ -1,4 +1,5 @@
-#include "serializable_class.h"
+#include "Internals.h"
+#include <PostProcessing/SerializableClassInfo.h>
 
 FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
     : Context(Context) {
@@ -6,7 +7,7 @@ FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
 }
 
 /// @brief 
-/// @param Declaration 
+/// @param Declaration - AST type for a specific class.
 /// @return true indicates that iteration through the translation unit shall continue
 bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
     auto name = Declaration->getNameAsString();
@@ -14,16 +15,19 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         return true;
     }
     
-    if (Declaration->isCompleteDefinition())
-        SerializableCXXRecordDeclStorage::AddSerializableDecl(Declaration->getCanonicalDecl());
-    /*
-    for (auto field : Declaration->fields()) {
-        if (field->hasAttr<AnnotateAttr>()) {
-        llvm::outs() <<field->getAttr<AnnotateAttr>()->getAnnotation() << "\n";
-        }
-        llvm::outs() << field->getNameAsString() << "\n";
+    auto thisClassInfo = std::make_shared<SerializableClassInfo>(name);
+    
+    ClassAnalyzer::FetchSerializableMembers(Declaration, thisClassInfo);
+
+    FunctionTemplateDecl* serializeMethod = nullptr;
+    if (!ClassAnalyzer::FetchSerializeMethod(Declaration, serializeMethod)) {
+        thisClassInfo->SetError(SerializationError::Error_SerializeMethodNotFound);
     }
-    */
+    else {
+
+    }
+
+    SerializableClassInfoAggregator::AddSerializableDecl(std::move(thisClassInfo));
     return true;
 }
 
@@ -47,8 +51,6 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
 
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     auto ptr = std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
-
-    llvm::outs() << ((SerializableCXXRecordDeclStorage::GetClasses()[0], "Basic_SerializableWithoutFunction") ? "HasAnnotation" : "HasNotAnnotation");
 
     return std::move(ptr);
 }
