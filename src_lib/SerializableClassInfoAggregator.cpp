@@ -66,7 +66,7 @@ void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, 
     return;
 }
 
-bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, FunctionTemplateDecl* serializeDecl) {
+bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, FunctionTemplateDecl*& serializeDecl) {
     auto decls = serializable->decls();
 
     auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
@@ -88,27 +88,38 @@ bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, Func
     
     return false;
 }
+
+void ClassAnalyzer::AnalyzeSerializeMethod(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) {
+    classInfo->SetError(checkAllSerializeableInSerialize(serializeMethod, classInfo));
+}
+
 /*
 std::vector<std::string> ClassAnalyzer::getSerializableMembers(const FunctionTemplateDecl* serialize_function) {
 
 }
 */
 
-/*
-bool ClassAnalyzer::checkAllSerializeableInSerialize(const FunctionTemplateDecl* serialize_function, const CXXRecordDecl* serializable) {
+SerializationError ClassAnalyzer::checkAllSerializeableInSerialize(const FunctionTemplateDecl* serialize_function, const SerializableClassInfoPtr serializableClass) {
+    SerializationError error = SerializationError::Error_NoError;
+
     const auto* function_decl = serialize_function->getTemplatedDecl();
     auto body = function_decl->getBody();
 
     SerializableStmtVisitor visitor{};
     visitor.TraverseStmt(body);
-    auto serializeContents = visitor.GetSerializeContents();
-    auto fields = getSerializableMembers(serializable);
+    auto methodContents = visitor.GetSerializeContents();
+    auto classFields = serializableClass->GetFields();
 
-    for (auto& field : fields) {
-        if (std::find(serializeContents.begin(), serializeContents.end(), field) == serializeContents.end()) {
-            return false;
+    for (auto& field : classFields) {
+        if (std::find(methodContents.begin(), methodContents.end(), field.GetName()) == methodContents.end()) {
+            error |= SerializationError::Error_MarkedFieldNotSerialized;
         }
     }
-    return true;
+
+    for (auto& field : methodContents) {
+        if (std::find_if(classFields.begin(), classFields.end(), [field](SerializableFieldInfo& info){ return info.GetName() == field;}) == classFields.end()) {
+            error |= SerializationError::Error_UnmarkedFieldSerialized;
+        }
+    }
+    return error;
 }
-*/

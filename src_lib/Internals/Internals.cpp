@@ -1,5 +1,6 @@
 #include "Internals.h"
 #include <PostProcessing/SerializableClassInfo.h>
+#include "clang/AST/DeclTemplate.h"
 
 FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
     : Context(Context) {
@@ -24,7 +25,8 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         thisClassInfo->SetError(SerializationError::Error_SerializeMethodNotFound);
     }
     else {
-
+        thisClassInfo->GenerateSerializeMethodInfo();
+        ClassAnalyzer::AnalyzeSerializeMethod(serializeMethod, thisClassInfo);
     }
 
     SerializableClassInfoAggregator::AddSerializableDecl(std::move(thisClassInfo));

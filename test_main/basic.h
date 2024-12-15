@@ -58,12 +58,16 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized.expired());
     ASSERT_FALSE(class_Basic_UntaggedMemberSeralized.expired());
     auto class_Basic_SerializableWithoutFunction_Ptr = class_Basic_SerializableWithoutFunction.lock();
+    auto class_Basic_AllMembersSerialized_Ptr = class_Basic_AllMembersSerialized.lock();
+    auto class_Basic_OneMemberNotSerialized_Ptr = class_Basic_OneMemberNotSerialized.lock();
+    auto class_Basic_TaggedMemberNotSerialized_Ptr = class_Basic_TaggedMemberNotSerialized.lock();
+    auto class_Basic_UntaggedMemberSeralized_Ptr = class_Basic_UntaggedMemberSeralized.lock();
     
     ASSERT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
-    //ASSERT_TRUE(SerializableInClassAnalyzer::hasSerializeMethod(class_Basic_AllMembersSerialized));
-    //ASSERT_TRUE(SerializableInClassAnalyzer::hasSerializeMethod(class_Basic_OneMemberNotSerialized));
-    //ASSERT_TRUE(SerializableInClassAnalyzer::hasSerializeMethod(class_Basic_TaggedMemberNotSerialized));
-    //ASSERT_TRUE(SerializableInClassAnalyzer::hasSerializeMethod(class_Basic_UntaggedMemberSeralized));
+    ASSERT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
     /*
     auto method_Basic_AllMembersSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_AllMembersSerialized);
     auto method_Basic_OneMemberNotSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_OneMemberNotSerialized);
