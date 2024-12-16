@@ -42,7 +42,7 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
 
     auto serializable_classes = SerializableClassInfoAggregator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 5);
+    ASSERT_EQ(serializable_classes.size(), 6);
 
     auto class_Basic_NotSerialized = GetClassFromVector(serializable_classes, "Basic_NotSerialized");
     auto class_Basic_SerializableWithoutFunction = GetClassFromVector(serializable_classes, "Basic_SerializableWithoutFunction");
@@ -50,6 +50,7 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     auto class_Basic_OneMemberNotSerialized = GetClassFromVector(serializable_classes, "Basic_OneMemberNotSerialized");
     auto class_Basic_TaggedMemberNotSerialized = GetClassFromVector(serializable_classes, "Basic_TaggedMemberNotSerialized");
     auto class_Basic_UntaggedMemberSeralized = GetClassFromVector(serializable_classes, "Basic_UntaggedMemberSeralized");
+    auto class_Basic_TwoErrorsAtOnce = GetClassFromVector(serializable_classes, "Basic_TwoErrorsAtOnce");
 
     ASSERT_TRUE(class_Basic_NotSerialized.expired());
     ASSERT_FALSE(class_Basic_SerializableWithoutFunction.expired());
@@ -57,17 +58,21 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     ASSERT_FALSE(class_Basic_OneMemberNotSerialized.expired());
     ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized.expired());
     ASSERT_FALSE(class_Basic_UntaggedMemberSeralized.expired());
+    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce.expired());
     auto class_Basic_SerializableWithoutFunction_Ptr = class_Basic_SerializableWithoutFunction.lock();
     auto class_Basic_AllMembersSerialized_Ptr = class_Basic_AllMembersSerialized.lock();
     auto class_Basic_OneMemberNotSerialized_Ptr = class_Basic_OneMemberNotSerialized.lock();
     auto class_Basic_TaggedMemberNotSerialized_Ptr = class_Basic_TaggedMemberNotSerialized.lock();
     auto class_Basic_UntaggedMemberSeralized_Ptr = class_Basic_UntaggedMemberSeralized.lock();
+    auto class_Basic_TwoErrorsAtOnce_Ptr = class_Basic_TwoErrorsAtOnce.lock();
     
     ASSERT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
     ASSERT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_NoError));
     ASSERT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_NoError));
     ASSERT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
     ASSERT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
     /*
     auto method_Basic_AllMembersSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_AllMembersSerialized);
     auto method_Basic_OneMemberNotSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_OneMemberNotSerialized);

@@ -85,3 +85,19 @@ struct SERIALIZABLE Basic_UntaggedMemberSeralized {
         ar & m_c;
     }
 };
+
+struct SERIALIZABLE Basic_TwoErrorsAtOnce {
+    SERIALIZABLE int m_a = 1;
+    float m_b = 1.;
+    SERIALIZABLE char m_c = 'c';
+
+    Basic_TwoErrorsAtOnce(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    Basic_TwoErrorsAtOnce() = default;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_a;
+        ar & m_b;
+    }
+};
