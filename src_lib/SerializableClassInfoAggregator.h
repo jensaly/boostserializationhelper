@@ -21,6 +21,8 @@ public:
     static bool AddSerializableDecl(SerializableClassInfoPtr&& serializable);
 
     static std::vector<SerializableClassInfoWeakPtr> FlattenSerializableContainer();
+
+    static void Reset();
 private:
     static std::unordered_map<SerializableClassName, SerializableClassInfoPtr> serializables;
 };

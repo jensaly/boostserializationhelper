@@ -21,6 +21,10 @@ std::vector<SerializableClassInfoWeakPtr> SerializableClassInfoAggregator::Flatt
     }
     return classes;
 }
+
+void SerializableClassInfoAggregator::Reset() {
+    serializables.clear();
+}
 /*
 bool ClassAnalyzer::hasSerializeMethod(const CXXRecordDecl* serializable) {
     return getSerializeMethod(serializable) != nullptr;
@@ -67,10 +71,12 @@ void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, 
 }
 
 bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, FunctionTemplateDecl*& serializeDecl) {
+    // Serialize methods are always template functions
+
     auto decls = serializable->decls();
 
+    // Search the decl to see if the method is found internally.
     auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
-        // Inline serialize-method is always a template function
         if (auto templateMethod = dyn_cast<FunctionTemplateDecl>(decl)) {
             if (templateMethod->getNameAsString() == "serialize") {
                 
@@ -85,6 +91,8 @@ bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, Func
         serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
         return true;
     }
+
+    // Search the translation unit.
     
     return false;
 }

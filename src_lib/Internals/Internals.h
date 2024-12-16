@@ -14,6 +14,7 @@ class FindSerializableClassVisitor
 public:
   explicit FindSerializableClassVisitor(ASTContext *Context);
   bool VisitCXXRecordDecl(CXXRecordDecl *Declaration);
+  bool VisitFunctionDecl(FunctionDecl *Declaration);
 private:
   ASTContext *Context;
 

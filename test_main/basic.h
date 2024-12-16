@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gtest/gtest.h>
 #include <basic/basic_class.hpp>
 #include "Internals/Internals.h"
@@ -33,7 +35,19 @@ SerializableClassInfoWeakPtr GetClassFromVector(std::vector<SerializableClassInf
     return (it != decls.end()) ? *it : SerializableClassInfoWeakPtr();
 }
 
-TEST(SH_BasicProject_Tests, BasicAnalysis) {
+class SH_Tests : public ::testing::Test {
+protected:
+    void SetUp() override {
+    SerializableClassInfoAggregator::Reset();
+    }
+
+    void TearDown() override {
+        SerializableClassInfoAggregator::Reset();
+    }
+};
+
+
+TEST_F(SH_Tests, BasicAnalysis) {
     std::string file = "./projects/basic/basic_class.hpp";
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
@@ -73,15 +87,25 @@ TEST(SH_BasicProject_Tests, BasicAnalysis) {
     ASSERT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
     ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
     ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
-    /*
-    auto method_Basic_AllMembersSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_AllMembersSerialized);
-    auto method_Basic_OneMemberNotSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_OneMemberNotSerialized);
-    auto method_Basic_TaggedMemberNotSerialized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_TaggedMemberNotSerialized);
-    auto method_Basic_UntaggedMemberSeralized = SerializableInClassAnalyzer::getSerializeMethod(class_Basic_UntaggedMemberSeralized);
-
-    ASSERT_TRUE(SerializableInClassAnalyzer::checkAllSerializeableInSerialize(method_Basic_AllMembersSerialized, class_Basic_AllMembersSerialized));
-    ASSERT_TRUE(SerializableInClassAnalyzer::checkAllSerializeableInSerialize(method_Basic_OneMemberNotSerialized, class_Basic_OneMemberNotSerialized));
-    ASSERT_FALSE(SerializableInClassAnalyzer::checkAllSerializeableInSerialize(method_Basic_TaggedMemberNotSerialized, class_Basic_TaggedMemberNotSerialized));
-    ASSERT_TRUE(SerializableInClassAnalyzer::checkAllSerializeableInSerialize(method_Basic_UntaggedMemberSeralized, class_Basic_UntaggedMemberSeralized));
-    */
 }
+
+TEST_F(SH_Tests, NonIntrusiveAnalysis) {
+    std::string file = "./projects/non_intrusive/non_intrusive.hpp";
+    std::string code = GetCodeFromSourceFile(file);
+    std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
+
+    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+
+    auto serializable_classes = SerializableClassInfoAggregator::FlattenSerializableContainer();
+
+    ASSERT_EQ(serializable_classes.size(), 1);
+
+    auto class_NonIntrusive_NoError = GetClassFromVector(serializable_classes, "NonIntrusive_NoError");
+
+    ASSERT_FALSE(class_NonIntrusive_NoError.expired());
+
+    auto class_NonIntrusive_NoError_Ptr = class_NonIntrusive_NoError.lock();
+
+    ASSERT_TRUE(class_NonIntrusive_NoError_Ptr->HasError(SerializationError::Error_NoError));
+}
+

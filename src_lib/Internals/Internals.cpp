@@ -33,6 +33,19 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     return true;
 }
 
+/// @brief 
+/// @param Declaration - AST type for a specific class.
+/// @return true indicates that iteration through the translation unit shall continue
+bool FindSerializableClassVisitor::VisitFunctionDecl(FunctionDecl *FuncDecl) {
+    if (FuncDecl->getNameAsString() == "serialize" && FuncDecl->isTemplateDecl()) {
+        if (FuncDecl->getNumParams() > 1) {
+            QualType ParamType = FuncDecl->getParamDecl(1)->getType();
+            // Register the pointer as a free serialize function.
+        }
+    }
+    return true;
+}
+
 bool FindSerializableClassVisitor::isClassSerializable(CXXRecordDecl *declaration) {
     if (!declaration->hasAttr<AnnotateAttr>()) {
         return false;
