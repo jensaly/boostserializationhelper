@@ -4,10 +4,6 @@ std::vector<SerializableFieldInfo> const& SerializableClassInfo::GetFields() con
     return m_fields;
 }
 
-void SerializeMethodInline::RunChecks(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) {
-    auto body = serializeMethod->getBody();
-}
-
 SerializableClassInfo::SerializableClassInfo(std::string className) : m_className{className} {
 
 }
@@ -28,8 +24,4 @@ bool SerializableClassInfo::HasError(SerializationError error) const {
     if (error != SerializationError::Error_NoError) 
         return (m_errors & error) != SerializationError::Error_NoError;
     return true;
-}
-
-void SerializableClassInfo::GenerateSerializeMethodInfo() {
-    m_methodInfo = std::make_unique<SerializeMethodInline>();
 }

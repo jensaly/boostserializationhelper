@@ -11,10 +11,13 @@
 using namespace clang;
 
 class SerializableClassInfo;
+class SerializeFunctionInfo;
 
 using SerializableClassName = std::string;
 using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
 using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
+using SerializeFunctionInfoPtr = std::shared_ptr<SerializeFunctionInfo>;
+using SerializeFunctionInfoWeakPtr = std::weak_ptr<const SerializeFunctionInfo>;
 
 class SerializableClassInfoAggregator {
 public:
@@ -24,7 +27,16 @@ public:
 
     static void Reset();
 private:
-    static std::unordered_map<SerializableClassName, SerializableClassInfoPtr> serializables;
+    static std::unordered_map<CXXRecordDecl*, SerializableClassInfoPtr> serializables;
+};
+
+class SerializeFunctionInfoAggregator {
+public:
+    static bool AddSerializeDecl(SerializeFunctionInfoPtr&& serializable);
+
+    static void Reset();
+private:
+    static std::unordered_map<FunctionTemplateDecl*, SerializeFunctionInfoPtr> serializables;
 };
 
 class ClassAnalyzer {

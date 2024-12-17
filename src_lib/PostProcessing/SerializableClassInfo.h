@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "SerializationErrors.h"
+#include "SerializeFunctionInfo.h"
 #include <memory>
 
 #include "clang/AST/DeclTemplate.h"
@@ -21,31 +22,6 @@ public:
     std::string GetName() const { return m_name; }
 };
 
-// Interface for handling of inline, non-intrusive and split serialize methods
-class ISerializeMethodInfo {
-public:
-    virtual void RunChecks(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) = 0;
-    virtual ~ISerializeMethodInfo() {}
-};
-
-class SerializeMethodInline : public ISerializeMethodInfo {
-public:
-    void RunChecks(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) override;
-    SerializeMethodInline() = default;
-    ~SerializeMethodInline() override = default;
-};
-
-class SerializeMethodNonIntrusive {
-
-};
-
-class SerializeMethodSplitInline {
-
-};
-
-class SerializeMethodSplitNonIntrusive {
-
-};
 
 class SerializableClassInfo {
     std::string m_className;
@@ -54,7 +30,7 @@ class SerializableClassInfo {
 
     std::vector<SerializableFieldInfo> m_fields;
 
-    std::unique_ptr<ISerializeMethodInfo> m_methodInfo;
+    std::weak_ptr<SerializeFunctionInfo> m_methodInfo; // Other side stores the FunctionTemplateDecl*
 
 public:
     SerializationError GetErrors() const { return m_errors; }

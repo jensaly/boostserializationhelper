@@ -5,12 +5,14 @@ set(HEADERS
         SerializableClassInfoAggregator.h
         PostProcessing/SerializationErrors.h
         PostProcessing/SerializableClassInfo.h
+        PostProcessing/SerializeFunctionInfo.h
     )
 
 set(SOURCES
         Internals/Internals.cpp
         SerializableClassInfoAggregator.cpp
         PostProcessing/SerializableClassInfo.cpp
+        PostProcessing/SerializeFunctionInfo.cpp
     )
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})

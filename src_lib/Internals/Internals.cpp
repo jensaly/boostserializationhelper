@@ -1,5 +1,6 @@
 #include "Internals.h"
 #include <PostProcessing/SerializableClassInfo.h>
+#include <PostProcessing/SerializeFunctionInfo.h>
 #include "clang/AST/DeclTemplate.h"
 
 FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
@@ -33,14 +34,17 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     return true;
 }
 
-/// @brief 
+/// @brief Visits free functions
 /// @param Declaration - AST type for a specific class.
 /// @return true indicates that iteration through the translation unit shall continue
 bool FindSerializableClassVisitor::VisitFunctionDecl(FunctionDecl *FuncDecl) {
     if (FuncDecl->getNameAsString() == "serialize" && FuncDecl->isTemplateDecl()) {
-        if (FuncDecl->getNumParams() > 1) {
+        auto asTemplateDecl = dynamic_cast<FunctionTemplateDecl*>(FuncDecl);
+        if (FuncDecl->getNumParams() > 1) { // Free serialize methods have 3 parameters, second is type
             QualType ParamType = FuncDecl->getParamDecl(1)->getType();
-            // Register the pointer as a free serialize function.
+            auto asTemplateDecl_Ptr = std::make_shared<SerializeFunctionInfo_NonIntrusive>(asTemplateDecl);
+            // Look up the CXXRecordDecl and (if one has been discovered) associate it via weak_ptr
+            SerializeFunctionInfoAggregator::AddSerializeDecl(std::move(asTemplateDecl_Ptr));
         }
     }
     return true;
