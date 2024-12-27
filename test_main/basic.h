@@ -38,11 +38,11 @@ SerializableClassInfoWeakPtr GetClassFromVector(std::vector<SerializableClassInf
 class SH_Tests : public ::testing::Test {
 protected:
     void SetUp() override {
-    SerializableClassInfoAggregator::Reset();
+    SerializableClassInfoMediator::Reset();
     }
 
     void TearDown() override {
-        SerializableClassInfoAggregator::Reset();
+        SerializableClassInfoMediator::Reset();
     }
 };
 
@@ -54,7 +54,7 @@ TEST_F(SH_Tests, BasicAnalysis) {
 
     ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
-    auto serializable_classes = SerializableClassInfoAggregator::FlattenSerializableContainer();
+    auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
     ASSERT_EQ(serializable_classes.size(), 6);
 
@@ -96,7 +96,7 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
 
     ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
-    auto serializable_classes = SerializableClassInfoAggregator::FlattenSerializableContainer();
+    auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
     ASSERT_EQ(serializable_classes.size(), 1);
 

@@ -9,32 +9,26 @@
 #include "clang/AST/DeclTemplate.h"
 
 class SerializableClassInfo;
+class SerializableFieldInfo;
 
 using SerializableClassName = std::string;
 using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
 using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
-
-class SerializableFieldInfo {
-    std::string m_name;
-public:
-    SerializableFieldInfo(std::string name) : m_name{name} {}
-
-    std::string GetName() const { return m_name; }
-};
-
 
 class SerializableClassInfo {
     std::string m_className;
     SerializationError m_errors = SerializationError::Error_NoError;
     SerializationInformation m_info = SerializationInformation::Info_NoInfo;
 
-    std::vector<SerializableFieldInfo> m_fields;
+    std::vector<SerializableFieldInfo> m_fields; // Serializable fields inside of the class
 
-    std::weak_ptr<SerializeFunctionInfo> m_methodInfo; // Other side stores the FunctionTemplateDecl*
+    std::shared_ptr<SerializeFunctionInfo> m_methodInfo = nullptr; // Pointer to its serialize-function information
 
 public:
     SerializationError GetErrors() const { return m_errors; }
     std::vector<SerializableFieldInfo> const& GetFields() const;
+
+    bool SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo);
 
     SerializableClassInfo(std::string className);
 
@@ -45,6 +39,8 @@ public:
     void SetError(SerializationError error);
 
     bool HasError(SerializationError error) const;
+
+    bool HasSerializeMethod() const;
 
     void GenerateSerializeMethodInfo();
 

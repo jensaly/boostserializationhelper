@@ -2,17 +2,23 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(HEADERS 
         Internals/Internals.h
-        SerializableClassInfoAggregator.h
+        Internals/SerializationContext.h
+        SerializableClassInfoMediator.h
         PostProcessing/SerializationErrors.h
         PostProcessing/SerializableClassInfo.h
+        PostProcessing/SerializableFieldInfo.h
         PostProcessing/SerializeFunctionInfo.h
+        PostProcessing/SerializeOperationInfo.h
     )
 
 set(SOURCES
         Internals/Internals.cpp
-        SerializableClassInfoAggregator.cpp
+        Internals/SerializationContext.cpp
+        SerializableClassInfoMediator.cpp
         PostProcessing/SerializableClassInfo.cpp
+        PostProcessing/SerializableFieldInfo.cpp
         PostProcessing/SerializeFunctionInfo.cpp
+        PostProcessing/SerializeOperationInfo.cpp
     )
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})

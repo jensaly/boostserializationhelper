@@ -7,6 +7,10 @@
 
 #include "clang/AST/DeclTemplate.h"
 
+class SerializableClassInfo;
+using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
+class SerializeOperationInfo;
+
 // Interface for handling of inline, non-intrusive and split serialize methods
 class ISerializeFunctionInfo {
 public:
@@ -19,17 +23,18 @@ class SerializeFunctionInfo {
     SerializationInformation m_info = SerializationInformation::Info_NoInfo;
 
     clang::FunctionTemplateDecl* m_decl = nullptr;
-    //CXXRecordDecl* classDecl = nullptr; // Used for reverse lookup in processing.
+    
+    std::vector<SerializeOperationInfo> m_operationsInfo;
 
 public:
     SerializationError GetErrors() const { return m_errors; }
-    std::vector<SerializableFieldInfo> const& GetFields() const;
+    std::vector<SerializeOperationInfo> const& GetFields() const { return m_operationsInfo; };
 
     SerializeFunctionInfo(clang::FunctionTemplateDecl* decl);
 
-    virtual ~SerializeFunctionInfo() { }
+    virtual ~SerializeFunctionInfo();
 
-    void AddSerializableField(SerializableFieldInfo fieldInfo);
+    void AddSerializableField(SerializeOperationInfo operationInfo);
 
     void SetError(SerializationError error);
 
@@ -41,14 +46,16 @@ public:
 };
 
 // Created by CXXRecordDecl during discovery, immediately associated
-class SerializeFunctionInfo_Intrusive : SerializeFunctionInfo {
+class SerializeFunctionInfo_Intrusive : public SerializeFunctionInfo {
+public:
     SerializeFunctionInfo_Intrusive() = delete;
     SerializeFunctionInfo_Intrusive(clang::FunctionTemplateDecl* decl);
     ~SerializeFunctionInfo_Intrusive() override = default;
 };
 
 // Created freely during discovery, associated later.
-class SerializeFunctionInfo_NonIntrusive : SerializeFunctionInfo {
+class SerializeFunctionInfo_NonIntrusive : public SerializeFunctionInfo {
+public:
     SerializeFunctionInfo_NonIntrusive() = delete;
     SerializeFunctionInfo_NonIntrusive(clang::FunctionTemplateDecl* decl);
     ~SerializeFunctionInfo_NonIntrusive() override = default;

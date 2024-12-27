@@ -19,24 +19,30 @@ using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
 using SerializeFunctionInfoPtr = std::shared_ptr<SerializeFunctionInfo>;
 using SerializeFunctionInfoWeakPtr = std::weak_ptr<const SerializeFunctionInfo>;
 
-class SerializableClassInfoAggregator {
+// Mediator-classes store both the AST information and the persistent information. They exist until mediation phase.
+
+class SerializableClassInfoMediator {
 public:
-    static bool AddSerializableDecl(SerializableClassInfoPtr&& serializable);
+    friend class SerializationContext;
+
+    static bool AddSerializableDecl(CXXRecordDecl* decl, SerializableClassInfoPtr&& serializable);
 
     static std::vector<SerializableClassInfoWeakPtr> FlattenSerializableContainer();
 
     static void Reset();
 private:
-    static std::unordered_map<CXXRecordDecl*, SerializableClassInfoPtr> serializables;
+    static std::unordered_map<std::string, SerializableClassInfoPtr> serializables;
 };
 
-class SerializeFunctionInfoAggregator {
+class SerializeFunctionInfoMediator {
 public:
-    static bool AddSerializeDecl(SerializeFunctionInfoPtr&& serializable);
+    friend class SerializationContext;
+
+    static bool AddSerializeDecl(FunctionTemplateDecl* decl, SerializeFunctionInfoPtr&& serializable);
 
     static void Reset();
 private:
-    static std::unordered_map<FunctionTemplateDecl*, SerializeFunctionInfoPtr> serializables;
+    static std::unordered_map<std::string, SerializeFunctionInfoPtr> serializables;
 };
 
 class ClassAnalyzer {

@@ -1,54 +1,45 @@
 #include <PostProcessing/SerializableClassInfo.h>
+#include <PostProcessing/SerializableFieldInfo.h>
 #include <Internals/Internals.h>
 #include <iostream>
 
-std::unordered_map<SerializableClassName, SerializableClassInfoPtr> SerializableClassInfoAggregator::serializables{};
+std::unordered_map<std::string, SerializableClassInfoPtr> SerializableClassInfoMediator::serializables{};
 
-bool SerializableClassInfoAggregator::AddSerializableDecl(SerializableClassInfoPtr&& serializable) {
-    auto name = serializable->GetClassName();
-    if (serializables.find(name) != serializables.end()) {
+bool SerializableClassInfoMediator::AddSerializableDecl(CXXRecordDecl* decl, SerializableClassInfoPtr&& serializable) {
+    if (serializables.find(decl->getQualifiedNameAsString()) != serializables.end()) {
         return false;
     }
-    serializables.insert({name, std::move(serializable)});
+    serializables.insert({decl->getQualifiedNameAsString(), std::move(serializable)});
     return true;
 }
 
-std::vector<SerializableClassInfoWeakPtr> SerializableClassInfoAggregator::FlattenSerializableContainer() {
+std::vector<SerializableClassInfoWeakPtr> SerializableClassInfoMediator::FlattenSerializableContainer() {
     std::vector<SerializableClassInfoWeakPtr> classes{};
-    for (auto& [name, classPtr] : serializables) {
+    for (auto& [decl, classPtr] : serializables) {
         auto ptr = SerializableClassInfoWeakPtr(classPtr);
         classes.push_back(ptr);
     }
     return classes;
 }
 
-void SerializableClassInfoAggregator::Reset() {
+void SerializableClassInfoMediator::Reset() {
     serializables.clear();
 }
-/*
-bool ClassAnalyzer::hasSerializeMethod(const CXXRecordDecl* serializable) {
-    return getSerializeMethod(serializable) != nullptr;
-}
 
-FunctionTemplateDecl* ClassAnalyzer::getSerializeMethod(const CXXRecordDecl* serializable) {
-    auto decls = serializable->decls();
+std::unordered_map<std::string, SerializeFunctionInfoPtr> SerializeFunctionInfoMediator::serializables{};
 
-    auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
-        if (auto template_method = dyn_cast<FunctionTemplateDecl>(decl)) {
-            if (template_method->getNameAsString() == "serialize") {
-                return true;
-            }
-        }
+bool SerializeFunctionInfoMediator::AddSerializeDecl(FunctionTemplateDecl* decl, SerializeFunctionInfoPtr&& serializable) {
+    if (serializables.find(decl->getQualifiedNameAsString()) != serializables.end()) {
         return false;
-    });
-    
-    if (serialize_it != decls.end()) {
-        return dyn_cast<FunctionTemplateDecl>(*serialize_it);
     }
-    
-    return nullptr;
+    serializables.insert({decl->getQualifiedNameAsString(), std::move(serializable)});
+    return true;
 }
-*/
+
+void SerializeFunctionInfoMediator::Reset() {
+    serializables.clear();
+}
+
 void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo) {
     std::vector<std::string> serializable_members;
     if (!serializable->hasDefinition()) {
@@ -70,7 +61,12 @@ void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, 
     return;
 }
 
-bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, FunctionTemplateDecl*& serializeDecl) {
+/// @brief Fetches serialize method from INSIDE the class declaration (intrusive), if one exists (another attempt is made during mediation)
+/// Phase: Discovery.
+/// @param serializable - AST node for the serializable class.
+/// @param serializeDecl - Out-parameter, the intrusive serialize-method
+/// @return true if an intrusive method was found, false otherwise
+bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, /*out*/ FunctionTemplateDecl*& serializeDecl) {
     // Serialize methods are always template functions
 
     auto decls = serializable->decls();
@@ -79,7 +75,6 @@ bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, Func
     auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
         if (auto templateMethod = dyn_cast<FunctionTemplateDecl>(decl)) {
             if (templateMethod->getNameAsString() == "serialize") {
-                
                 return true;
             }
         }
@@ -91,9 +86,8 @@ bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, Func
         serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
         return true;
     }
-
-    // Search the translation unit.
     
+    serializeDecl = nullptr;
     return false;
 }
 
