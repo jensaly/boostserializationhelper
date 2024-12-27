@@ -28,11 +28,28 @@ void SerializableClassInfoMediator::Reset() {
 
 std::unordered_map<std::string, SerializeFunctionInfoPtr> SerializeFunctionInfoMediator::serializables{};
 
-bool SerializeFunctionInfoMediator::AddSerializeDecl(FunctionTemplateDecl* decl, SerializeFunctionInfoPtr&& serializable) {
-    if (serializables.find(decl->getQualifiedNameAsString()) != serializables.end()) {
+bool SerializeFunctionInfoMediator::AddSerializeDecl(clang::FunctionDecl* decl, SerializeFunctionInfoPtr&& serializable) {
+    // Preceeding function has ascertained that there is at least 2 arguments
+    auto ParamType = decl->getParamDecl(1)->getType();
+    const Type *UnderlyingType = ParamType.getTypePtr()->getUnqualifiedDesugaredType();
+    std::string ClassName = "";
+    
+    // Underlying type for non-intrusive serialize-functions is a pointer or reference.
+    if (UnderlyingType->isPointerType() || UnderlyingType->isReferenceType()) {
+        QualType PointeeType = UnderlyingType->getPointeeType();
+        if (const auto *Record = PointeeType->getAs<RecordType>()) {
+            ClassName = Record->getDecl()->getNameAsString();
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Already registered. Should never happen.
+    if (serializables.find(ClassName) != serializables.end()) {
         return false;
     }
-    serializables.insert({decl->getQualifiedNameAsString(), std::move(serializable)});
+    serializables.insert({ClassName, std::move(serializable)});
     return true;
 }
 
@@ -81,47 +98,12 @@ bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, /*ou
         return false;
     });
     
-    if (serialize_it != decls.end()) {
-
-        serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
-        return true;
+    if (serialize_it == decls.end()) {
+        // No intrusive method found. Setting the Decl to nullptr and returning false
+        serializeDecl = nullptr;
+        return false;
     }
     
-    serializeDecl = nullptr;
-    return false;
-}
-
-void ClassAnalyzer::AnalyzeSerializeMethod(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) {
-    classInfo->SetError(checkAllSerializeableInSerialize(serializeMethod, classInfo));
-}
-
-/*
-std::vector<std::string> ClassAnalyzer::getSerializableMembers(const FunctionTemplateDecl* serialize_function) {
-
-}
-*/
-
-SerializationError ClassAnalyzer::checkAllSerializeableInSerialize(const FunctionTemplateDecl* serialize_function, const SerializableClassInfoPtr serializableClass) {
-    SerializationError error = SerializationError::Error_NoError;
-
-    const auto* function_decl = serialize_function->getTemplatedDecl();
-    auto body = function_decl->getBody();
-
-    SerializableStmtVisitor visitor{};
-    visitor.TraverseStmt(body);
-    auto methodContents = visitor.GetSerializeContents();
-    auto classFields = serializableClass->GetFields();
-
-    for (auto& field : classFields) {
-        if (std::find(methodContents.begin(), methodContents.end(), field.GetName()) == methodContents.end()) {
-            error |= SerializationError::Error_MarkedFieldNotSerialized;
-        }
-    }
-
-    for (auto& field : methodContents) {
-        if (std::find_if(classFields.begin(), classFields.end(), [field](SerializableFieldInfo& info){ return info.GetName() == field;}) == classFields.end()) {
-            error |= SerializationError::Error_UnmarkedFieldSerialized;
-        }
-    }
-    return error;
+    serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
+    return true;
 }

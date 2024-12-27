@@ -22,7 +22,7 @@ class SerializeFunctionInfo {
     SerializationError m_errors = SerializationError::Error_NoError;
     SerializationInformation m_info = SerializationInformation::Info_NoInfo;
 
-    clang::FunctionTemplateDecl* m_decl = nullptr;
+    clang::FunctionDecl* m_decl = nullptr;
     
     std::vector<SerializeOperationInfo> m_operationsInfo;
 
@@ -30,7 +30,7 @@ public:
     SerializationError GetErrors() const { return m_errors; }
     std::vector<SerializeOperationInfo> const& GetFields() const { return m_operationsInfo; };
 
-    SerializeFunctionInfo(clang::FunctionTemplateDecl* decl);
+    SerializeFunctionInfo(clang::FunctionDecl* decl);
 
     virtual ~SerializeFunctionInfo();
 
@@ -49,7 +49,7 @@ public:
 class SerializeFunctionInfo_Intrusive : public SerializeFunctionInfo {
 public:
     SerializeFunctionInfo_Intrusive() = delete;
-    SerializeFunctionInfo_Intrusive(clang::FunctionTemplateDecl* decl);
+    SerializeFunctionInfo_Intrusive(clang::FunctionDecl* decl);
     ~SerializeFunctionInfo_Intrusive() override = default;
 };
 
@@ -57,6 +57,6 @@ public:
 class SerializeFunctionInfo_NonIntrusive : public SerializeFunctionInfo {
 public:
     SerializeFunctionInfo_NonIntrusive() = delete;
-    SerializeFunctionInfo_NonIntrusive(clang::FunctionTemplateDecl* decl);
+    SerializeFunctionInfo_NonIntrusive(clang::FunctionDecl* decl);
     ~SerializeFunctionInfo_NonIntrusive() override = default;
 };

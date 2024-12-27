@@ -19,6 +19,8 @@ void SerializationContext::ResolveNonIntrusiveSerializeMethods() {
         if (it == freeSerializables.end()) {
             // Could not find serialize method by mediation.
             // Error no serialize method
+            info->SetSerializeMethodInfo(nullptr);
+            continue;
         }
         info->SetSerializeMethodInfo(it->second);
     }

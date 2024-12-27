@@ -1,6 +1,7 @@
 #pragma once
 
 #include "clang/AST/AST.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -38,7 +39,7 @@ class SerializeFunctionInfoMediator {
 public:
     friend class SerializationContext;
 
-    static bool AddSerializeDecl(FunctionTemplateDecl* decl, SerializeFunctionInfoPtr&& serializable);
+    static bool AddSerializeDecl(FunctionDecl* decl, SerializeFunctionInfoPtr&& serializable);
 
     static void Reset();
 private:
@@ -49,7 +50,6 @@ class ClassAnalyzer {
 public:
     //static bool hasSerializeMethod(const CXXRecordDecl* serializable);
     static bool FetchSerializeMethod(const CXXRecordDecl* serializable, /* out */ FunctionTemplateDecl*& serializeDecl);
-    static SerializationError checkAllSerializeableInSerialize(const FunctionTemplateDecl* serialize_function, const SerializableClassInfoPtr serializable);
     static void FetchSerializableMembers(const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo);
     //static std::vector<std::string> getSerializableMembers(const FunctionTemplateDecl* serialize_function);
     static void AnalyzeSerializeMethod(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo);

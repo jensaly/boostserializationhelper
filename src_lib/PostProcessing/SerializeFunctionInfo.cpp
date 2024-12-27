@@ -1,7 +1,7 @@
 #include "SerializeFunctionInfo.h"
 #include "SerializeOperationInfo.h"
 
-SerializeFunctionInfo::SerializeFunctionInfo(clang::FunctionTemplateDecl* decl) : m_decl{decl} {
+SerializeFunctionInfo::SerializeFunctionInfo(clang::FunctionDecl* decl) : m_decl{decl} {
     
 }
 
@@ -23,10 +23,10 @@ bool SerializeFunctionInfo::HasError(SerializationError error) const {
     return true;
 }
 
-SerializeFunctionInfo_Intrusive::SerializeFunctionInfo_Intrusive(clang::FunctionTemplateDecl* decl) : SerializeFunctionInfo(decl) {
+SerializeFunctionInfo_Intrusive::SerializeFunctionInfo_Intrusive(clang::FunctionDecl* decl) : SerializeFunctionInfo(decl) {
 
 }
 
-SerializeFunctionInfo_NonIntrusive::SerializeFunctionInfo_NonIntrusive(clang::FunctionTemplateDecl* decl) : SerializeFunctionInfo(decl)  {
+SerializeFunctionInfo_NonIntrusive::SerializeFunctionInfo_NonIntrusive(clang::FunctionDecl* decl) : SerializeFunctionInfo(decl)  {
     
 }

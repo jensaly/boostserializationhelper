@@ -25,13 +25,25 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     
     ClassAnalyzer::FetchSerializableMembers(Declaration, thisClassInfo);
 
-    FunctionTemplateDecl* serializeMethod = nullptr;
-    if (!ClassAnalyzer::FetchSerializeMethod(Declaration, serializeMethod)) {
+    FunctionTemplateDecl* serializeMethodTemplate = nullptr;
+    if (!ClassAnalyzer::FetchSerializeMethod(Declaration, serializeMethodTemplate)) {
         // No intrusive serialize method exists. One may be set during mediation.
     }
     else {
-        //thisClassInfo->GenerateSerializeMethodInfo();
-        thisClassInfo->SetSerializeMethodInfo(std::make_shared<SerializeFunctionInfo_Intrusive>(serializeMethod));
+        auto serializeMethod = serializeMethodTemplate->getAsFunction();
+        // Intrusive method found. Set it.
+        auto intrusiveSerializeMethodInfo = std::make_shared<SerializeFunctionInfo_Intrusive>(serializeMethod);
+        auto body = serializeMethod->getBody();
+
+        SerializableStmtVisitor visitor{};
+        visitor.TraverseStmt(body);
+        auto methodContents = visitor.GetSerializeContents();
+
+        for (auto& field : methodContents) {
+            intrusiveSerializeMethodInfo->AddSerializableField(SerializeOperationInfo(field));
+        };
+
+        thisClassInfo->SetSerializeMethodInfo(intrusiveSerializeMethodInfo);
     }
 
     SerializableClassInfoMediator::AddSerializableDecl(Declaration, std::move(thisClassInfo));
@@ -43,27 +55,32 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
 /// @param Declaration - AST type for a specific class.
 /// @return true indicates that iteration through the translation unit shall continue
 bool FindSerializableClassVisitor::VisitFunctionDecl(FunctionDecl *FuncDecl) {
-    if (FuncDecl->getNameAsString() != "serialize" || !FuncDecl->isTemplateDecl()) {
+    if (FuncDecl->getNameAsString() != "serialize") {
         return true;
     }
-    auto asTemplateDecl = dynamic_cast<FunctionTemplateDecl*>(FuncDecl);
+
+    if (FuncDecl->getDeclContext()->isRecord()) {
+        return true;
+    }
+
+    // Check that it is a template function?
     if (FuncDecl->getNumParams() < 2) { // Free serialize methods have 3 parameters, second is type
         return true;
     }
     
-    auto asTemplateDecl_Ptr = std::make_shared<SerializeFunctionInfo_NonIntrusive>(asTemplateDecl);
+    auto FuncDecl_Ptr = std::make_shared<SerializeFunctionInfo_NonIntrusive>(FuncDecl);
     
-    auto body = asTemplateDecl->getBody();
+    auto body = FuncDecl->getBody();
 
     SerializableStmtVisitor visitor{};
     visitor.TraverseStmt(body);
     auto methodContents = visitor.GetSerializeContents();
 
     for (auto& field : methodContents) {
-        asTemplateDecl_Ptr->AddSerializableField(SerializeOperationInfo(field));
+        FuncDecl_Ptr->AddSerializableField(SerializeOperationInfo(field));
     }
 
-    SerializeFunctionInfoMediator::AddSerializeDecl(asTemplateDecl, std::move(asTemplateDecl_Ptr));
+    SerializeFunctionInfoMediator::AddSerializeDecl(FuncDecl, std::move(FuncDecl_Ptr));
     return true;
 }
 

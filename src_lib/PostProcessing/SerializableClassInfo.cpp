@@ -7,7 +7,7 @@ std::vector<SerializableFieldInfo> const& SerializableClassInfo::GetFields() con
 }
 
 bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo) {
-    if (m_methodInfo == nullptr) {
+    if (m_methodInfo != nullptr) {
         return false;
     }
     m_methodInfo = serializeFunctionInfo;
@@ -45,6 +45,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
 
     if (m_methodInfo == nullptr) {
         SetError(SerializationError::Error_SerializeMethodNotFound);
+        return;
     }
 
     auto methodContents = m_methodInfo->GetFields();
@@ -54,7 +55,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
         if (std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfo& operationInfo){ 
             return field == operationInfo;
         }) == methodContents.end()) {
-            error |= SerializationError::Error_MarkedFieldNotSerialized;
+            SetError(SerializationError::Error_MarkedFieldNotSerialized);
         }
     }
 
@@ -62,7 +63,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
         if (std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfo& operationInfo){ 
             return field == operationInfo;
         }) == classFields.end()) {
-            error |= SerializationError::Error_UnmarkedFieldSerialized;
+            SetError(SerializationError::Error_UnmarkedFieldSerialized);
         }
     }
 }
