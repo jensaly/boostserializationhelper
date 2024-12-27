@@ -98,14 +98,18 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 1);
+    ASSERT_EQ(serializable_classes.size(), 2);
 
     auto class_NonIntrusive_NoError = GetClassFromVector(serializable_classes, "NonIntrusive_NoError");
+    auto class_NonIntrusive_TaggedMemberNotSerialized = GetClassFromVector(serializable_classes, "NonIntrusive_TaggedMemberNotSerialized");
 
     ASSERT_FALSE(class_NonIntrusive_NoError.expired());
+    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized.expired());
 
     auto class_NonIntrusive_NoError_Ptr = class_NonIntrusive_NoError.lock();
+    auto class_NonIntrusive_TaggedMemberNotSerialized_Ptr = class_NonIntrusive_TaggedMemberNotSerialized.lock();
 
     ASSERT_TRUE(class_NonIntrusive_NoError_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_TRUE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
 }
 
