@@ -1,19 +1,26 @@
 #pragma once
 
-#include <string>
+// ==================================
+// Standard Library Headers
+// ==================================
 #include <vector>
-#include "SerializationErrors.h"
-#include "SerializeFunctionInfo.h"
-#include <memory>
 
+// ==================================
+// Internal Headers
+// ==================================
+#include <Types/InfoTypes.h>
+#include <SerializationInfo/SerializationErrors.h>
+#include <SerializationInfo/SerializeFunctionInfo.h>
+
+// ==================================
+// Libtooling Headers
+// ==================================
 #include "clang/AST/DeclTemplate.h"
 
-class SerializableClassInfo;
-class SerializableFieldInfo;
+// ==================================
+// Forward Declarations
+// ==================================
 
-using SerializableClassName = std::string;
-using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
-using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
 
 class SerializableClassInfo {
     std::string m_className;
@@ -41,8 +48,6 @@ public:
     bool HasError(SerializationError error) const;
 
     bool HasSerializeMethod() const;
-
-    void GenerateSerializeMethodInfo();
 
     void RunSerializeMethodAnalysis();
 };

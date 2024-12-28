@@ -1,10 +1,25 @@
-#include "Internals.h"
-#include <PostProcessing/SerializableClassInfo.h>
-#include <PostProcessing/SerializeFunctionInfo.h>
-#include "SerializationContext.h"
-#include <PostProcessing/SerializableFieldInfo.h>
-#include <PostProcessing/SerializeOperationInfo.h>
+// ==================================
+// Standard Library Headers
+// ==================================
+
+// ==================================
+// Internal Headers
+// ==================================
+#include <Internals/Internals.h>
+#include <SerializationInfo/SerializableClassInfo.h>
+#include <SerializationInfo/SerializeFunctionInfo.h>
+#include <SerializationInfo/SerializableFieldInfo.h>
+#include <SerializationInfo/SerializeOperationInfo.h>
+#include <SerializationContext.h>
+
+// ==================================
+// Libtooling Headers
+// ==================================
 #include "clang/AST/DeclTemplate.h"
+
+// ==================================
+// Forward Declarations
+// ==================================
 
 FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
     : Context(Context) {
@@ -23,10 +38,10 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
 
     auto thisClassInfo = std::make_shared<SerializableClassInfo>(name);
     
-    ClassAnalyzer::FetchSerializableMembers(Declaration, thisClassInfo);
+    DiscoveryHelper::FetchSerializableMembers(Declaration, thisClassInfo);
 
     FunctionTemplateDecl* serializeMethodTemplate = nullptr;
-    if (!ClassAnalyzer::FetchSerializeMethod(Declaration, serializeMethodTemplate)) {
+    if (!DiscoveryHelper::FetchSerializeMethod(Declaration, serializeMethodTemplate)) {
         // No intrusive serialize method exists. One may be set during mediation.
     }
     else {

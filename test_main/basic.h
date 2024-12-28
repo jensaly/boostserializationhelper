@@ -5,7 +5,7 @@
 #include "Internals/Internals.h"
 #include <fstream>
 #include <sstream>
-#include "PostProcessing/SerializableClassInfo.h"
+#include "SerializationInfo/SerializableClassInfo.h"
 
 using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
 
@@ -38,7 +38,7 @@ SerializableClassInfoWeakPtr GetClassFromVector(std::vector<SerializableClassInf
 class SH_Tests : public ::testing::Test {
 protected:
     void SetUp() override {
-    SerializableClassInfoMediator::Reset();
+        SerializableClassInfoMediator::Reset();
     }
 
     void TearDown() override {

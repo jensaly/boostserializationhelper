@@ -1,7 +1,21 @@
-#include <PostProcessing/SerializableClassInfo.h>
-#include <PostProcessing/SerializableFieldInfo.h>
+// ==================================
+// Standard Library Headers
+// ==================================
+
+// ==================================
+// Internal Headers
+// ==================================
 #include <Internals/Internals.h>
-#include <iostream>
+#include <SerializationInfo/SerializableClassInfo.h>
+#include <SerializationInfo/SerializableFieldInfo.h>
+
+// ==================================
+// Libtooling Headers
+// ==================================
+
+// ==================================
+// Forward Declarations
+// ==================================
 
 std::unordered_map<std::string, SerializableClassInfoPtr> SerializableClassInfoMediator::serializables{};
 
@@ -57,7 +71,11 @@ void SerializeFunctionInfoMediator::Reset() {
     serializables.clear();
 }
 
-void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo) {
+/// @brief Fetches serializable members of the RecordDecl
+/// Phase: Discovery
+/// @param serializable - The CXXRecordDecl for the serializable class
+/// @param classInfo - The serializable class info
+void DiscoveryHelper::FetchSerializableMembers(const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo) {
     std::vector<std::string> serializable_members;
     if (!serializable->hasDefinition()) {
         return;
@@ -83,7 +101,7 @@ void ClassAnalyzer::FetchSerializableMembers(const CXXRecordDecl* serializable, 
 /// @param serializable - AST node for the serializable class.
 /// @param serializeDecl - Out-parameter, the intrusive serialize-method
 /// @return true if an intrusive method was found, false otherwise
-bool ClassAnalyzer::FetchSerializeMethod(const CXXRecordDecl* serializable, /*out*/ FunctionTemplateDecl*& serializeDecl) {
+bool DiscoveryHelper::FetchSerializeMethod(const CXXRecordDecl* serializable, /*out*/ FunctionTemplateDecl*& serializeDecl) {
     // Serialize methods are always template functions
 
     auto decls = serializable->decls();

@@ -1,11 +1,25 @@
 #pragma once
 
-#include <string>
+// ==================================
+// Standard Library Headers
+// ==================================
 #include <vector>
-#include "SerializationErrors.h"
-#include <memory>
 
+// ==================================
+// Internal Headers
+// ==================================
+#include <Types/InfoTypes.h>
+#include <SerializationInfo/SerializationErrors.h>
+
+// ==================================
+// Libtooling Headers
+// ==================================
 #include "clang/AST/DeclTemplate.h"
+
+// ==================================
+// Forward Declarations
+// ==================================
+
 
 class SerializableClassInfo;
 using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
