@@ -1,6 +1,7 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(HEADERS 
+        Diagnostics/Diagnostics.h
         Internals/Internals.h
         SerializationContext.h
         Mediation/SerializableClassInfoMediator.h
@@ -13,6 +14,7 @@ set(HEADERS
     )
 
 set(SOURCES
+        Diagnostics/Diagnositcs.cpp
         Internals/Internals.cpp
         SerializationContext.cpp
         Mediation/SerializableClassInfoMediator.cpp
