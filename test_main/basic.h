@@ -80,13 +80,36 @@ TEST_F(SH_Tests, BasicAnalysis) {
     auto class_Basic_UntaggedMemberSeralized_Ptr = class_Basic_UntaggedMemberSeralized.lock();
     auto class_Basic_TwoErrorsAtOnce_Ptr = class_Basic_TwoErrorsAtOnce.lock();
     
+    // Testing errors in detail to ensure it's not false positive
     ASSERT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_NoError));
+
     ASSERT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+
     ASSERT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+
     ASSERT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+
     ASSERT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_NoError));
+
     ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
     ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
 }
 
 TEST_F(SH_Tests, NonIntrusiveAnalysis) {
@@ -98,18 +121,44 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 2);
+    ASSERT_EQ(serializable_classes.size(), 5);
 
     auto class_NonIntrusive_NoError = GetClassFromVector(serializable_classes, "NonIntrusive_NoError");
     auto class_NonIntrusive_TaggedMemberNotSerialized = GetClassFromVector(serializable_classes, "NonIntrusive_TaggedMemberNotSerialized");
+    auto class_NonIntrusive_UntaggedMemberSeralized = GetClassFromVector(serializable_classes, "NonIntrusive_UntaggedMemberSeralized");
+    auto class_NonIntrusive_SerializableWithoutFunction = GetClassFromVector(serializable_classes, "NonIntrusive_SerializableWithoutFunction");
+    auto class_NonIntrusive_TwoErrorsAtOnce = GetClassFromVector(serializable_classes, "NonIntrusive_TwoErrorsAtOnce");
 
     ASSERT_FALSE(class_NonIntrusive_NoError.expired());
     ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized.expired());
+    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized.expired());
+    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction.expired());
+    ASSERT_FALSE(class_NonIntrusive_TwoErrorsAtOnce.expired());
 
     auto class_NonIntrusive_NoError_Ptr = class_NonIntrusive_NoError.lock();
     auto class_NonIntrusive_TaggedMemberNotSerialized_Ptr = class_NonIntrusive_TaggedMemberNotSerialized.lock();
+    auto class_NonIntrusive_UntaggedMemberSeralized_Ptr = class_NonIntrusive_UntaggedMemberSeralized.lock();
+    auto class_NonIntrusive_SerializableWithoutFunction_Ptr = class_NonIntrusive_SerializableWithoutFunction.lock();
+    auto class_NonIntrusive_TwoErrorsAtOnce_Ptr = class_NonIntrusive_TwoErrorsAtOnce.lock();
 
     ASSERT_TRUE(class_NonIntrusive_NoError_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+
     ASSERT_TRUE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_NoError));
+    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+
+    ASSERT_TRUE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationError::Error_NoError));
+
+    ASSERT_TRUE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_SerializeMethodNotFound));
+    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationError::Error_NoError));
+
+    ASSERT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_MarkedFieldNotSerialized));
+    ASSERT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationError::Error_NoError));
 }
 

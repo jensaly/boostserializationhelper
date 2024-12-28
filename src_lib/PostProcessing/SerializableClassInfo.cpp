@@ -31,9 +31,12 @@ void SerializableClassInfo::SetError(SerializationError error) {
 }
 
 bool SerializableClassInfo::HasError(SerializationError error) const {
-    if (error != SerializationError::Error_NoError) 
+    if (error != SerializationError::Error_NoError) {
         return (m_errors & error) != SerializationError::Error_NoError;
-    return true;
+    }
+    else {
+        return m_errors == error;
+    }
 }
 
 bool SerializableClassInfo::HasSerializeMethod() const {
