@@ -7,18 +7,16 @@
 #include "llvm/Support/raw_ostream.h"
 #include <Mediation/SerializableClassInfoMediator.h>
 
-using namespace clang;
-
 class FindSerializableClassVisitor
   : public clang::RecursiveASTVisitor<FindSerializableClassVisitor> {
 public:
-  explicit FindSerializableClassVisitor(ASTContext *Context);
-  bool VisitCXXRecordDecl(CXXRecordDecl *Declaration);
-  bool VisitFunctionDecl(FunctionDecl *Declaration);
+  explicit FindSerializableClassVisitor(clang::ASTContext *Context);
+  bool VisitCXXRecordDecl(clang::CXXRecordDecl *Declaration);
+  bool VisitFunctionDecl(clang::FunctionDecl *Declaration);
 private:
-  ASTContext *Context;
+  clang::ASTContext *Context;
 
-  bool isClassSerializable(CXXRecordDecl *declaration);
+  bool isClassSerializable(clang::CXXRecordDecl *declaration);
 };
 
 class FindSerializableClassConsumer : public clang::ASTConsumer {
@@ -39,6 +37,6 @@ public:
 class SerializableStmtVisitor : public clang::RecursiveASTVisitor<SerializableStmtVisitor> {
   std::vector<std::string> m_serializeContents;
 public:
-  bool VisitBinaryOperator(const BinaryOperator *op);
+  bool VisitBinaryOperator(const clang::BinaryOperator *op);
   const std::vector<std::string> GetSerializeContents();
 };

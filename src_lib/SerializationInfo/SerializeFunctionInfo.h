@@ -20,11 +20,6 @@
 // Forward Declarations
 // ==================================
 
-
-class SerializableClassInfo;
-using SerializableClassInfoPtr = std::shared_ptr<SerializableClassInfo>;
-class SerializeOperationInfo;
-
 // Interface for handling of inline, non-intrusive and split serialize methods
 class ISerializeFunctionInfo {
 public:

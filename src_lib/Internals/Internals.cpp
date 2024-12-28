@@ -21,6 +21,8 @@
 // Forward Declarations
 // ==================================
 
+using namespace clang;
+
 FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
     : Context(Context) {
     

@@ -7,8 +7,6 @@
 #include <sstream>
 #include "SerializationInfo/SerializableClassInfo.h"
 
-using SerializableClassInfoWeakPtr = std::weak_ptr<const SerializableClassInfo>;
-
 std::string GetCodeFromSourceFile(const std::string& filepath) {
     std::ifstream file;
     file.open(filepath);

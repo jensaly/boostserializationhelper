@@ -17,6 +17,8 @@
 // Forward Declarations
 // ==================================
 
+using namespace clang;
+
 std::unordered_map<std::string, SerializableClassInfoPtr> SerializableClassInfoMediator::serializables{};
 
 bool SerializableClassInfoMediator::AddSerializableDecl(CXXRecordDecl* decl, SerializableClassInfoPtr&& serializable) {
