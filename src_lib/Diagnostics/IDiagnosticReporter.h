@@ -11,12 +11,15 @@
 // ==================================
 // Libtooling Headers
 // ==================================
-#include "clang/AST/DeclTemplate.h"
 
 // ==================================
 // Forward Declarations
 // ==================================
 
-void setupDiagnostics(clang::DiagnosticsEngine &Diag);
+class DiagnosticMessage;
 
-void reportDiagnostic(clang::DiagnosticsEngine &Diag, const std::string &message);
+class IDiagnosticReporter {
+public:
+    virtual ~IDiagnosticReporter() = default;
+    virtual void report(const DiagnosticMessage &message) = 0;
+};

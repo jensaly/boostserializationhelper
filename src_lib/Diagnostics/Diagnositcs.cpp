@@ -29,11 +29,3 @@ void setupDiagnostics(clang::DiagnosticsEngine &Diag) {
     
     Diag.setClient(DiagClient.release(), /*shouldOwnClient=*/true);
 }
-
-void reportDiagnostic(clang::DiagnosticsEngine &Diag, const std::string &message) {
-    // Create a custom diagnostic ID
-    unsigned DiagID = Diag.getCustomDiagID(clang::DiagnosticsEngine::Error, message.c_str());
-
-    // Report the diagnostic
-    Diag.Report(DiagID);
-}

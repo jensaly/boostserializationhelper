@@ -3,20 +3,28 @@
 // ==================================
 // Standard Library Headers
 // ==================================
+#include <iostream>
 
 // ==================================
 // Internal Headers
 // ==================================
+#include <Diagnositcs/IDiagnosticReporter.h>
 
 // ==================================
 // Libtooling Headers
 // ==================================
-#include "clang/AST/DeclTemplate.h"
 
 // ==================================
 // Forward Declarations
 // ==================================
 
-void setupDiagnostics(clang::DiagnosticsEngine &Diag);
+class TestDiagnosticReporter : public IDiagnosticReporter {
+    std::ostream &output;
 
-void reportDiagnostic(clang::DiagnosticsEngine &Diag, const std::string &message);
+public:
+    explicit TestDiagnosticReporter(std::ostream &output = std::cout) : output(output) {}
+
+    void report(const DiagnosticMessage &message) override {
+        output << message.toString() << std::endl;
+    }
+};
