@@ -6,4 +6,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(test_utils STATIC test_utils.h test_utils.cpp)
 
-target_include_directories(test_utils PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(test_utils SYSTEM PUBLIC ${CMAKE_SOURCE_DIR})

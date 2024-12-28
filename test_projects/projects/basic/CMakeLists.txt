@@ -20,8 +20,8 @@ add_library(basic STATIC basic_class.h)
 # Add test files as part of this project
 add_library(basic_tests STATIC test_project.cpp)
 
-target_include_directories(basic PUBLIC ${CMAKE_SOURCE_DIR}/src_lib)
-target_include_directories(basic_tests PUBLIC ${CMAKE_SOURCE_DIR}/src_lib ${CMAKE_SOURCE_DIR}/test_projects/utils)
+target_include_directories(basic SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/src_lib)
+target_include_directories(basic_tests SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/src_lib ${CMAKE_SOURCE_DIR}/test_projects/utils)
 
 # Link tests to GTest and the project library
 target_link_libraries(basic basic_tests gtest gtest_main sh_lib test_utils ${Boost_LIBRARIES})

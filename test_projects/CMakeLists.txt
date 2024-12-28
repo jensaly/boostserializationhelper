@@ -23,18 +23,17 @@ include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
 cmake_minimum_required(VERSION 3.10)
-project(StaticAnalysisTestSuite)
+project(test_projects)
 
 include(GoogleTest)
 
-# Add subdirectories for each test project
-add_subdirectory(projects)
 add_subdirectory(utils)
 
-add_executable(test_all test_all.cpp)
+add_executable(test_all test_all.cpp test_basic_project.cpp test_complex_project.cpp test_non_intrusive.cpp)
 
-# Link with all the test libraries
-target_link_libraries(test_all basic gtest gtest_main)
-target_include_directories(test_all PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/projects/basic ${CMAKE_CURRENT_SOURCE_DIR}/projects/complex)
+target_link_libraries(test_all basic test_utils gtest gtest_main ${Boost_LIBRARIES})
+target_include_directories(test_all SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/projects/basic ${CMAKE_SOURCE_DIR}/projects/complex ${CMAKE_SOURCE_DIR}/projects/non_intrusive utils)
 
-gtest_discover_tests(test_all basic_tests)
+gtest_discover_tests(test_all)
+
+install(TARGETS test_all DESTINATION ${CMAKE_INSTALL_PREFIX})
