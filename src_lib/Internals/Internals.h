@@ -7,6 +7,9 @@
 #include "llvm/Support/raw_ostream.h"
 #include <Mediation/SerializableClassInfoMediator.h>
 
+// AST Traversal and object tracking
+// Phase: Discovery.
+
 class FindSerializableClassVisitor
   : public clang::RecursiveASTVisitor<FindSerializableClassVisitor> {
 public:
