@@ -1,7 +1,6 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(HEADERS 
-        Diagnostics/Diagnostics.h
+set(HEADERS
         Diagnostics/DiagnosticMessage.h
         Diagnostics/IDiagnosticReporter.h
         Diagnostics/TestDiagnosticReporter.h
@@ -14,18 +13,20 @@ set(HEADERS
         SerializationInfo/SerializeFunctionInfo.h
         SerializationInfo/SerializeOperationInfo.h
         Types/InfoTypes.h
+        Utils/Utils.h
     )
 
 set(SOURCES
-        Diagnostics/Diagnositcs.cpp
         Diagnostics/DiagnosticMessage.cpp
         Internals/Internals.cpp
         SerializationContext.cpp
         Mediation/SerializableClassInfoMediator.cpp
+        SerializationInfo/SerializationErrors.cpp
         SerializationInfo/SerializableClassInfo.cpp
         SerializationInfo/SerializableFieldInfo.cpp
         SerializationInfo/SerializeFunctionInfo.cpp
         SerializationInfo/SerializeOperationInfo.cpp
+        Utils/Utils.cpp
     )
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})

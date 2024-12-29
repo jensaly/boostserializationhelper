@@ -4,4 +4,4 @@
 #include <random>
 #include <filesystem>
 
-std::string generateUniqueFilename(const std::string& directory = ".", const std::string& extension = ".txt", size_t length = 64);
+std::string generateUniqueFilename(const std::string directory = ".", const std::string extension = ".txt", size_t length = 64);

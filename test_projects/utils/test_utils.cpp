@@ -13,7 +13,7 @@ std::string generateRandomString(size_t length) {
     return randomString;
 }
 
-std::string generateUniqueFilename(const std::string& directory, const std::string& extension, size_t length) {
+std::string generateUniqueFilename(const std::string directory, const std::string extension, size_t length) {
     std::string filename;
     do {
         std::string randomString = generateRandomString(length);

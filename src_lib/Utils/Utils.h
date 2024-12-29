@@ -11,12 +11,14 @@
 // ==================================
 // Libtooling Headers
 // ==================================
-#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/ASTContext.h"
 
 // ==================================
 // Forward Declarations
 // ==================================
 
-void setupDiagnostics(clang::DiagnosticsEngine &Diag);
-
-void reportDiagnostic(clang::DiagnosticsEngine &Diag, const std::string &message);
+class Utils {
+public:
+    static bool GetFullLocaionOfDecl(clang::ASTContext& context, clang::Decl* decl, /* out */ std::string& filename, /* out */ unsigned int& line, /* out */ unsigned int& column);
+};

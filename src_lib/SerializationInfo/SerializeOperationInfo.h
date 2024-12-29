@@ -19,6 +19,8 @@
 
 class SerializableFieldInfo;
 
+// Class for storing a single serialization operator (ar & field)
+
 class SerializeOperationInfo {
     std::string m_name;
 public:

@@ -29,7 +29,8 @@ bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<SerializeFunc
     return true;
 }
 
-SerializableClassInfo::SerializableClassInfo(std::string className) : m_className{className} {
+SerializableClassInfo::SerializableClassInfo(std::string className, std::string filename, unsigned int line, unsigned int column)
+        : m_className{className}, m_filename{filename}, m_line{line}, m_column{column} {
 
 }
 
@@ -41,16 +42,21 @@ void SerializableClassInfo::AddSerializableField(SerializableFieldInfo fieldInfo
     m_fields.push_back(fieldInfo);
 }
 
-void SerializableClassInfo::SetError(SerializationError error) {
-    m_errors |= error;
+void SerializableClassInfo::SetError(SerializationErrorFlag error) {
+    m_errorFlags |= error;
 }
 
-bool SerializableClassInfo::HasError(SerializationError error) const {
-    if (error != SerializationError::Error_NoError) {
-        return (m_errors & error) != SerializationError::Error_NoError;
+void SerializableClassInfo::SetError(std::unique_ptr<SerializationError>&& error) {
+    SetError(error->m_flag);
+    m_errors.push_back(std::move(error));
+}
+
+bool SerializableClassInfo::HasError(SerializationErrorFlag error) const {
+    if (error != SerializationErrorFlag::Error_NoError) {
+        return (m_errorFlags & error) != SerializationErrorFlag::Error_NoError;
     }
     else {
-        return m_errors == error;
+        return m_errorFlags == error;
     }
 }
 
@@ -59,10 +65,10 @@ bool SerializableClassInfo::HasSerializeMethod() const {
 }
 
 void SerializableClassInfo::RunSerializeMethodAnalysis() {
-    SerializationError error = SerializationError::Error_NoError;
+    SerializationErrorFlag error = SerializationErrorFlag::Error_NoError;
 
     if (m_methodInfo == nullptr) {
-        SetError(SerializationError::Error_SerializeMethodNotFound);
+        SetError(SerializationError(SerializationErrorFlag::Error_SerializeMethodNotFound));
         return;
     }
 
@@ -70,10 +76,17 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
     auto classFields = GetFields();
 
     for (auto& field : classFields) {
-        if (std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfo& operationInfo){ 
+        auto operation_it = std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfo& operationInfo){ 
             return field == operationInfo;
-        }) == methodContents.end()) {
-            SetError(SerializationError::Error_MarkedFieldNotSerialized);
+        });
+        if (operation_it == methodContents.end()) {
+            auto& operation = *operation_it;
+            // No serialize operations could be matched to the content of the class definition
+            auto error = std::make_unique<SerializationError_MarkedFieldNotSerialized>(
+                field.GetFilename(), field.GetLine(), field.GetColumn(),
+                operation.GetFilename(), operation.GetLine(), operation.GetColumn()
+            );
+            SetError(std::move(error));
         }
     }
 
@@ -81,7 +94,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
         if (std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfo& operationInfo){ 
             return field == operationInfo;
         }) == classFields.end()) {
-            SetError(SerializationError::Error_UnmarkedFieldSerialized);
+            SetError(SerializationErrorFlag::Error_UnmarkedFieldSerialized);
         }
     }
 }

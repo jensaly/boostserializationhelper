@@ -11,6 +11,7 @@
 #include <SerializationInfo/SerializableFieldInfo.h>
 #include <SerializationInfo/SerializeOperationInfo.h>
 #include <SerializationContext.h>
+#include <Utils/Utils.h>
 
 // ==================================
 // Libtooling Headers
@@ -33,17 +34,21 @@ FindSerializableClassVisitor::FindSerializableClassVisitor(ASTContext *Context)
 /// @param Declaration - AST type for a specific class.
 /// @return true indicates that iteration through the translation unit shall continue
 bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration) {
-    auto name = Declaration->getNameAsString();
     if (!isClassSerializable(Declaration)) {
         return true;
     }
-
-    auto thisClassInfo = std::make_shared<SerializableClassInfo>(name);
     
-    DiscoveryHelper::FetchSerializableMembers(Declaration, thisClassInfo);
+    auto name = Declaration->getNameAsString();
+    std::string filename;
+    unsigned int line, column;
+    Utils::GetFullLocaionOfDecl(*Context, Declaration, filename, line, column);
+
+    auto thisClassInfo = std::make_shared<SerializableClassInfo>(name, filename, line, column);
+    
+    DiscoveryHelper::FetchSerializableMembers(*Context, Declaration, thisClassInfo);
 
     FunctionTemplateDecl* serializeMethodTemplate = nullptr;
-    if (!DiscoveryHelper::FetchSerializeMethod(Declaration, serializeMethodTemplate)) {
+    if (!DiscoveryHelper::FetchSerializeMethod(*Context, Declaration, serializeMethodTemplate)) {
         // No intrusive serialize method exists. One may be set during mediation.
     }
     else {

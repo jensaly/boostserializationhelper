@@ -8,6 +8,7 @@
 #include <Internals/Internals.h>
 #include <SerializationInfo/SerializableClassInfo.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
+#include <Utils/Utils.h>
 
 // ==================================
 // Libtooling Headers
@@ -77,7 +78,7 @@ void SerializeFunctionInfoMediator::Reset() {
 /// Phase: Discovery
 /// @param serializable - The CXXRecordDecl for the serializable class
 /// @param classInfo - The serializable class info
-void DiscoveryHelper::FetchSerializableMembers(const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo) {
+void DiscoveryHelper::FetchSerializableMembers(clang::ASTContext& context, const CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo) {
     std::vector<std::string> serializable_members;
     if (!serializable->hasDefinition()) {
         return;
@@ -91,7 +92,10 @@ void DiscoveryHelper::FetchSerializableMembers(const CXXRecordDecl* serializable
         if (attr->getAnnotation() != "serializable") {
             continue;
         }
-        SerializableFieldInfo fieldInfo{field->getNameAsString()};
+        std::string filename;
+        unsigned int line, column;
+        Utils::GetFullLocaionOfDecl(context, field, filename, line, column);
+        SerializableFieldInfo fieldInfo{field->getNameAsString(), filename, line, column};
         classInfo->AddSerializableField(fieldInfo);
     }
 
@@ -103,7 +107,7 @@ void DiscoveryHelper::FetchSerializableMembers(const CXXRecordDecl* serializable
 /// @param serializable - AST node for the serializable class.
 /// @param serializeDecl - Out-parameter, the intrusive serialize-method
 /// @return true if an intrusive method was found, false otherwise
-bool DiscoveryHelper::FetchSerializeMethod(const CXXRecordDecl* serializable, /*out*/ FunctionTemplateDecl*& serializeDecl) {
+bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXXRecordDecl* serializable, /*out*/ FunctionTemplateDecl*& serializeDecl) {
     // Serialize methods are always template functions
 
     auto decls = serializable->decls();

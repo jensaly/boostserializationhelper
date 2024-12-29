@@ -24,28 +24,35 @@
 
 class SerializableClassInfo {
     std::string m_className;
-    SerializationError m_errors = SerializationError::Error_NoError;
-    SerializationInformation m_info = SerializationInformation::Info_NoInfo;
+    std::string m_filename{"NOTAFILE"};
+    unsigned int m_line = UINT32_MAX;
+    unsigned int m_column = UINT32_MAX;
+    SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError; // Just the error flags set for the object.
+    SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
     std::vector<SerializableFieldInfo> m_fields; // Serializable fields inside of the class
 
     std::shared_ptr<SerializeFunctionInfo> m_methodInfo = nullptr; // Pointer to its serialize-function information
 
+    std::vector<std::unique_ptr<SerializationError>> m_errors;
+
 public:
-    SerializationError GetErrors() const { return m_errors; }
+    SerializationErrorFlag GetErrors() const { return m_errorFlags; }
     std::vector<SerializableFieldInfo> const& GetFields() const;
 
     bool SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo);
 
-    SerializableClassInfo(std::string className);
+    SerializableClassInfo(std::string className, std::string filename, unsigned int line, unsigned int column);
 
     SerializableClassName GetClassName() const;
 
     void AddSerializableField(SerializableFieldInfo fieldInfo);
 
-    void SetError(SerializationError error);
+    void SetError(SerializationErrorFlag error);
 
-    bool HasError(SerializationError error) const;
+    void SetError(std::unique_ptr<SerializationError>&& error);
+
+    bool HasError(SerializationErrorFlag error) const;
 
     bool HasSerializeMethod() const;
 

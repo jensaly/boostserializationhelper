@@ -22,6 +22,8 @@ public:
 
     static void Analyze();
 
+    static void Log();
+
 private:
     static void ResolveNonIntrusiveSerializeMethods();
 };

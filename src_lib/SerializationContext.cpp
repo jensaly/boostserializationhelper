@@ -47,3 +47,10 @@ void SerializationContext::Analyze() {
         info->RunSerializeMethodAnalysis();
     }
 }
+
+void SerializationContext::Log() {
+    auto& serializableClasses = SerializableClassInfoMediator::serializables;
+    for (auto& [decl, info] : serializableClasses) {
+        info->RunSerializeMethodAnalysis();
+    }
+}

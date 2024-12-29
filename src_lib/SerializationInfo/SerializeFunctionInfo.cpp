@@ -28,13 +28,13 @@ void SerializeFunctionInfo::AddSerializableField(SerializeOperationInfo operatio
     m_operationsInfo.push_back(operationInfo);
 }
 
-void SerializeFunctionInfo::SetError(SerializationError error) {
-    m_errors |= error;
+void SerializeFunctionInfo::SetError(SerializationErrorFlag error) {
+    m_errorFlags |= error;
 }
 
-bool SerializeFunctionInfo::HasError(SerializationError error) const {
-    if (error != SerializationError::Error_NoError) 
-        return (m_errors & error) != SerializationError::Error_NoError;
+bool SerializeFunctionInfo::HasError(SerializationErrorFlag error) const {
+    if (error != SerializationErrorFlag::Error_NoError) 
+        return (m_errorFlags & error) != SerializationErrorFlag::Error_NoError;
     return true;
 }
 

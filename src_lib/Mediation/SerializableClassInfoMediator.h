@@ -59,6 +59,6 @@ private:
 
 class DiscoveryHelper {
 public:
-    static bool FetchSerializeMethod(const clang::CXXRecordDecl* serializable, /* out */ clang::FunctionTemplateDecl*& serializeDecl);
-    static void FetchSerializableMembers(const clang::CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo);
+    static bool FetchSerializeMethod(clang::ASTContext& context, const clang::CXXRecordDecl* serializable, /* out */ clang::FunctionTemplateDecl*& serializeDecl);
+    static void FetchSerializableMembers(clang::ASTContext& context, const clang::CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo);
 };

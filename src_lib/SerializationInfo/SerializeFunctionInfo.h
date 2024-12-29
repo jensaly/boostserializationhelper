@@ -28,15 +28,15 @@ public:
 };
 
 class SerializeFunctionInfo {
-    SerializationError m_errors = SerializationError::Error_NoError;
-    SerializationInformation m_info = SerializationInformation::Info_NoInfo;
+    SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError;
+    SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
     clang::FunctionDecl* m_decl = nullptr;
     
     std::vector<SerializeOperationInfo> m_operationsInfo;
 
 public:
-    SerializationError GetErrors() const { return m_errors; }
+    SerializationErrorFlag GetErrors() const { return m_errorFlags; }
     std::vector<SerializeOperationInfo> const& GetFields() const { return m_operationsInfo; };
 
     SerializeFunctionInfo(clang::FunctionDecl* decl);
@@ -45,9 +45,9 @@ public:
 
     void AddSerializableField(SerializeOperationInfo operationInfo);
 
-    void SetError(SerializationError error);
+    void SetError(SerializationErrorFlag error);
 
-    bool HasError(SerializationError error) const;
+    bool HasError(SerializationErrorFlag error) const;
 
     void GenerateSerializeMethodInfo();
 
