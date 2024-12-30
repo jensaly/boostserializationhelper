@@ -22,15 +22,11 @@
 // ==================================
 
 
-class SerializableClassInfo {
-    std::string m_className;
-    std::string m_filename{"NOTAFILE"};
-    unsigned int m_line = UINT32_MAX;
-    unsigned int m_column = UINT32_MAX;
+class SerializableClassInfo : public SerializationObject {
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError; // Just the error flags set for the object.
     SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
-    std::vector<SerializableFieldInfo> m_fields; // Serializable fields inside of the class
+    std::vector<std::shared_ptr<SerializableFieldInfo>> m_fields; // Serializable fields inside of the class
 
     std::shared_ptr<SerializeFunctionInfo> m_methodInfo = nullptr; // Pointer to its serialize-function information
 
@@ -38,7 +34,7 @@ class SerializableClassInfo {
 
 public:
     SerializationErrorFlag GetErrors() const { return m_errorFlags; }
-    std::vector<SerializableFieldInfo> const& GetFields() const;
+    std::vector<std::shared_ptr<SerializableFieldInfo>> const& GetFields() const;
 
     bool SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo);
 
@@ -46,7 +42,7 @@ public:
 
     SerializableClassName GetClassName() const;
 
-    void AddSerializableField(SerializableFieldInfo fieldInfo);
+    void AddSerializableField(std::shared_ptr<SerializableFieldInfo>&& fieldInfo);
 
     void SetError(SerializationErrorFlag error);
 

@@ -7,6 +7,8 @@
 // Internal Headers
 // ==================================
 #include <SerializationInfo/SerializationErrors.h>
+#include <SerializationInfo/SerializableFieldInfo.h>
+#include <SerializationInfo/SerializeOperationInfo.h>
 
 // ==================================
 // Libtooling Headers
@@ -44,4 +46,17 @@ SerializationError_MarkedFieldNotSerialized::SerializationError_MarkedFieldNotSe
 
 std::string SerializationError_MarkedFieldNotSerialized::ToString() const {
     return "Testing";
+}
+
+SerializationError_UnmarkedFieldSerialized::SerializationError_UnmarkedFieldSerialized(
+    SerializeOperationInfo& operation, SerializableFieldInfo& field) 
+        : SerializationError(SerializationErrorFlag::Error_UnmarkedFieldSerialized)
+{
+    
+}
+
+SerializationError_SerializeMethodNotFound::SerializationError_SerializeMethodNotFound() 
+        : SerializationError(SerializationErrorFlag::Error_SerializeMethodNotFound)
+{
+
 }

@@ -6,6 +6,7 @@
 // Internal Headers
 // ==================================
 #include <Internals/Internals.h>
+#include <SerializationInfo/InfoFactory.h>
 #include <SerializationInfo/SerializableClassInfo.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
 #include <Utils/Utils.h>
@@ -92,11 +93,9 @@ void DiscoveryHelper::FetchSerializableMembers(clang::ASTContext& context, const
         if (attr->getAnnotation() != "serializable") {
             continue;
         }
-        std::string filename;
-        unsigned int line, column;
-        Utils::GetFullLocaionOfDecl(context, field, filename, line, column);
-        SerializableFieldInfo fieldInfo{field->getNameAsString(), filename, line, column};
-        classInfo->AddSerializableField(fieldInfo);
+
+        auto fieldInfo = InfoFactory::Create<SerializableFieldInfo>(context, field);
+        classInfo->AddSerializableField(std::move(fieldInfo));
     }
 
     return;

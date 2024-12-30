@@ -38,8 +38,10 @@ public:
 
 // Visitor for the Stmt of serialize functions
 class SerializableStmtVisitor : public clang::RecursiveASTVisitor<SerializableStmtVisitor> {
-  std::vector<std::string> m_serializeContents;
+  std::vector<SerializeOperationInfoPtr> m_serializeContents;
+  clang::ASTContext *Context;
 public:
+  explicit SerializableStmtVisitor(clang::ASTContext* context);
   bool VisitBinaryOperator(const clang::BinaryOperator *op);
-  const std::vector<std::string> GetSerializeContents();
+  const std::vector<SerializeOperationInfoPtr> GetOperations();
 };

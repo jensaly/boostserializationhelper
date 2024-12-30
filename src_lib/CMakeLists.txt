@@ -7,7 +7,9 @@ set(HEADERS
         Internals/Internals.h
         SerializationContext.h
         Mediation/SerializableClassInfoMediator.h
+        SerializationInfo/InfoFactory.h
         SerializationInfo/SerializationErrors.h
+        SerializationInfo/SerializationObject.h
         SerializationInfo/SerializableClassInfo.h
         SerializationInfo/SerializableFieldInfo.h
         SerializationInfo/SerializeFunctionInfo.h
@@ -22,6 +24,7 @@ set(SOURCES
         SerializationContext.cpp
         Mediation/SerializableClassInfoMediator.cpp
         SerializationInfo/SerializationErrors.cpp
+        SerializationInfo/SerializationObject.cpp
         SerializationInfo/SerializableClassInfo.cpp
         SerializationInfo/SerializableFieldInfo.cpp
         SerializationInfo/SerializeFunctionInfo.cpp

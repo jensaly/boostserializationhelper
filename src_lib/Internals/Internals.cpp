@@ -6,6 +6,7 @@
 // Internal Headers
 // ==================================
 #include <Internals/Internals.h>
+#include <SerializationInfo/InfoFactory.h>
 #include <SerializationInfo/SerializableClassInfo.h>
 #include <SerializationInfo/SerializeFunctionInfo.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
@@ -38,12 +39,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         return true;
     }
     
-    auto name = Declaration->getNameAsString();
-    std::string filename;
-    unsigned int line, column;
-    Utils::GetFullLocaionOfDecl(*Context, Declaration, filename, line, column);
-
-    auto thisClassInfo = std::make_shared<SerializableClassInfo>(name, filename, line, column);
+    auto thisClassInfo = InfoFactory::Create<SerializableClassInfo>(Context, Declaration);
     
     DiscoveryHelper::FetchSerializableMembers(*Context, Declaration, thisClassInfo);
 
@@ -57,9 +53,9 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         auto intrusiveSerializeMethodInfo = std::make_shared<SerializeFunctionInfo_Intrusive>(serializeMethod);
         auto body = serializeMethod->getBody();
 
-        SerializableStmtVisitor visitor{};
+        SerializableStmtVisitor visitor{Context};
         visitor.TraverseStmt(body);
-        auto methodContents = visitor.GetSerializeContents();
+        auto methodContents = visitor.GetOperations();
 
         for (auto& field : methodContents) {
             intrusiveSerializeMethodInfo->AddSerializableField(SerializeOperationInfo(field));
@@ -134,18 +130,24 @@ std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsum
     return std::move(ptr);
 }
 
+SerializableStmtVisitor::SerializableStmtVisitor(clang::ASTContext* context)
+        : Context{context}
+{
+
+}
+
 bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
     if (op->getOpcode() == BO_And) {
         const Expr* lhs = op->getLHS();
         const Expr* rhs = op->getRHS();
-        
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
-            m_serializeContents.push_back(rhs_decl->getMemberDecl()->getNameAsString());
+            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(Context, rhs_decl->getMemberDecl());
+            m_serializeContents.push_back(std::move(operatonInfo));
         }
     }
     return true;
 }
 
-const std::vector<std::string> SerializableStmtVisitor::GetSerializeContents() {
+const std::vector<SerializeOperationInfoPtr> SerializableStmtVisitor::GetOperations() {
     return m_serializeContents;
 }

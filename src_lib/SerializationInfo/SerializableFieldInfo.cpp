@@ -17,7 +17,7 @@
 // ==================================
 
 SerializableFieldInfo::SerializableFieldInfo(std::string name, std::string filename, unsigned int line, unsigned int column)
-        : m_name{name}, m_filename{filename}, m_line{line}, m_column{column} {
+        : SerializationObject(name, filename, line, column) {
 
 }
 

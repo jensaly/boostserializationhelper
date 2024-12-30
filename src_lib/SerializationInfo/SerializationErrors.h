@@ -64,7 +64,7 @@ public:
     virtual std::string ToString() const = 0;
 };
 
-class SerializationError_MarkedFieldNotSerialized : SerializationError {
+class SerializationError_MarkedFieldNotSerialized : public SerializationError {
 private:
     std::string m_filenameDecl = "";
     unsigned int m_declLine; // Max value indicates that this error isn't related to a specific line
@@ -94,4 +94,34 @@ public:
     std::string ToString() const override;
 
     ~SerializationError_MarkedFieldNotSerialized() override = default;
+};
+
+class SerializationError_UnmarkedFieldSerialized : public SerializationError {
+private:
+    std::string m_filenameDecl = "";
+    unsigned int m_declLine; // Max value indicates that this error isn't related to a specific line
+    unsigned int m_declColumn; // Max value indicates that this error isn't related to a specific column
+    std::string m_filenameSave = "";
+    unsigned int m_saveLine;
+    unsigned int m_saveColumn;
+    std::string m_filenameLoad = "";
+    unsigned int m_loadLine;
+    unsigned int m_loadColumn;
+    bool m_split = false; // If set to false, there's a single serialize-function. 
+
+public:
+    // For split-member serialization
+    SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializableFieldInfo& field);
+
+    std::string ToString() const override;
+
+    ~SerializationError_UnmarkedFieldSerialized() override = default;
+};
+
+class SerializationError_SerializeMethodNotFound : public SerializationError {
+
+public:
+    SerializationError_SerializeMethodNotFound();
+
+    ~SerializationError_SerializeMethodNotFound() override = default;
 };

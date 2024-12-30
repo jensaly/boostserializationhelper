@@ -27,7 +27,7 @@ public:
     virtual ~ISerializeFunctionInfo() {}
 };
 
-class SerializeFunctionInfo {
+class SerializeFunctionInfo{
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError;
     SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 

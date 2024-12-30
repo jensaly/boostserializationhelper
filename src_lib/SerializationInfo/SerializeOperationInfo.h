@@ -8,6 +8,7 @@
 // ==================================
 // Internal Headers
 // ==================================
+#include <SerializationInfo/SerializationObject.h>
 
 // ==================================
 // Libtooling Headers
@@ -21,12 +22,7 @@ class SerializableFieldInfo;
 
 // Class for storing a single serialization operator (ar & field)
 
-class SerializeOperationInfo {
-    std::string m_name;
+class SerializeOperationInfo : public SerializationObject{
 public:
-    SerializeOperationInfo(std::string name) : m_name{name} {}
-
-    std::string GetName() const { return m_name; }
-
-    
+    SerializeOperationInfo(std::string operationName, std::string filename, unsigned int line, unsigned int column);
 };
