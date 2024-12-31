@@ -6,6 +6,8 @@
 #include <fstream>
 #include <sstream>
 #include "SerializationInfo/SerializableClassInfo.h"
+#include "SerializationContext.h"
+#include <Diagnostics/TestDiagnosticReporter.h>
 
 std::string GetCodeFromSourceFile(const std::string& filepath) {
     std::ifstream file;
@@ -41,11 +43,13 @@ protected:
 
     void TearDown() override {
         SerializableClassInfoMediator::Reset();
+        SerializationContext::Reset();
     }
 };
 
 
 TEST_F(SH_Tests, BasicAnalysis) {
+    SerializationContext::SetDiagnosticsReporter(std::make_unique<TestDiagnosticReporter>("BasicSingleTUTests.log"));
     std::string file = "./projects/basic/basic_class.hpp";
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
@@ -111,6 +115,7 @@ TEST_F(SH_Tests, BasicAnalysis) {
 }
 
 TEST_F(SH_Tests, NonIntrusiveAnalysis) {
+    SerializationContext::SetDiagnosticsReporter(std::make_unique<TestDiagnosticReporter>("NonIntrusiveSingleTUTests.log"));
     std::string file = "./projects/non_intrusive/non_intrusive.hpp";
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};

@@ -32,4 +32,24 @@ public:
 
         return std::make_shared<Output>(name, filename, line, column);
     }
+
+    template<class Output>
+    static std::shared_ptr<Output> Create(clang::ASTContext& context, const clang::MemberExpr* expr) {
+        clang::LangOptions opts;
+        std::string exprName = expr->getMemberNameInfo().getAsString();
+        // exprName will be either [object variable name].expr or just expr.
+        std::string exprFileName;
+        unsigned int exprLine, exprColumn;
+        Utils::GetFullLocaionOfExpr(context, expr, exprFileName, exprLine, exprColumn);
+        
+        auto decl = expr->getMemberDecl();
+        auto declName = decl->getNameAsString();
+        std::string declFileName;
+        unsigned int declLine, declColumn;
+        Utils::GetFullLocaionOfDecl(context, decl, declFileName, declLine, declColumn);
+
+        return std::make_shared<Output>(exprName, exprName, exprLine, exprColumn,
+                declName, declFileName, declLine, declColumn
+        );
+    }
 };

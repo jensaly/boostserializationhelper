@@ -7,6 +7,8 @@
 // ==================================
 // Internal Headers
 // ==================================
+#include <vector>
+#include <string>
 
 // ==================================
 // Libtooling Headers
@@ -21,5 +23,5 @@ class DiagnosticMessage;
 class IDiagnosticReporter {
 public:
     virtual ~IDiagnosticReporter() = default;
-    virtual void report(const DiagnosticMessage &message) = 0;
+    virtual void forward(std::vector<std::string> const& messages) = 0;
 };

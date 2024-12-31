@@ -28,6 +28,7 @@ set(HEADERS
 
 set(SOURCES
         Diagnostics/DiagnosticMessage.cpp
+        Diagnostics/TestDiagnosticReporter.cpp
         Internals/Internals.cpp
         SerializationContext.cpp
         Mediation/SerializableClassInfoMediator.cpp

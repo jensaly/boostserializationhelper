@@ -3,12 +3,12 @@
 // ==================================
 // Standard Library Headers
 // ==================================
-#include <iostream>
+#include <fstream>
 
 // ==================================
 // Internal Headers
 // ==================================
-#include <Diagnositcs/IDiagnosticReporter.h>
+#include <Diagnostics/IDiagnosticReporter.h>
 
 // ==================================
 // Libtooling Headers
@@ -19,12 +19,12 @@
 // ==================================
 
 class TestDiagnosticReporter : public IDiagnosticReporter {
-    std::ostream &output;
+    std::ofstream file;
 
 public:
-    explicit TestDiagnosticReporter(std::ostream &output = std::cout) : output(output) {}
+    explicit TestDiagnosticReporter(std::string filename);
 
-    void report(const DiagnosticMessage &message) override {
-        output << message.toString() << std::endl;
-    }
+    ~TestDiagnosticReporter();
+
+    void forward(std::vector<std::string> const& messages) override;
 };

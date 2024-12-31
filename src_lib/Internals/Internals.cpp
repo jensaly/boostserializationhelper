@@ -144,7 +144,7 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
         const Expr* lhs = op->getLHS();
         const Expr* rhs = op->getRHS();
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
-            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl->getMemberDecl());
+            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
             m_serializeContents.push_back(std::move(operatonInfo));
         }
     }

@@ -77,10 +77,11 @@ public:
 
 class SerializationError_MarkedFieldNotSerialized : public SerializationError {
 private:
-    std::string m_filenameDecl = "";
+    std::string m_fieldName = ";;UNKNOWN;;";
+    std::string m_filenameDecl = ";;UNKNOWN;;";
     unsigned int m_declLine; // Max value indicates that this error isn't related to a specific line
     unsigned int m_declColumn; // Max value indicates that this error isn't related to a specific column
-    std::string m_filenameSave = "";
+    std::string m_filenameSave = ";;UNKNOWN;;";
     unsigned int m_saveLine;
     unsigned int m_saveColumn;
     bool m_split = false; // If set to false, there's a single serialize-function. 
@@ -99,10 +100,11 @@ public:
 
 class SerializationError_UnmarkedFieldSerialized : public SerializationError {
 private:
-    std::string m_filenameDecl = "";
+    std::string m_fieldName = ";;UNKNOWN;;";
+    std::string m_filenameDecl = ";;UNKNOWN;;";
     unsigned int m_declLine; // Max value indicates that this error isn't related to a specific line
     unsigned int m_declColumn; // Max value indicates that this error isn't related to a specific column
-    std::string m_filenameSave = "";
+    std::string m_filenameSave = ";;UNKNOWN;;";
     unsigned int m_saveLine;
     unsigned int m_saveColumn;
     bool m_split = false; // If set to false, there's a single serialize-function. 

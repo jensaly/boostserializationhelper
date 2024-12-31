@@ -41,7 +41,7 @@ public:
 
     SerializableClassInfo(std::string className, std::string filename, unsigned int line, unsigned int column);
 
-    SerializableClassName GetClassName() const;
+    SerializableClassName GetClassName() const; // TODO: Needs to save whether its a class or a struct as well
 
     void AddSerializableField(std::shared_ptr<SerializableFieldInfo>&& fieldInfo);
 

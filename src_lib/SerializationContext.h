@@ -28,6 +28,8 @@ public:
 
     static void SetDiagnosticsReporter(std::unique_ptr<IDiagnosticReporter> reporter);
 
+    static void Reset();
+
 private:
     static std::unique_ptr<IDiagnosticReporter> m_reporter;
 

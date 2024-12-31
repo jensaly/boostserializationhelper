@@ -19,7 +19,17 @@
 // Forward Declarations
 // ==================================
 
-/// @brief 
+
+std::unique_ptr<IDiagnosticReporter> SerializationContext::m_reporter = nullptr;
+
+void SerializationContext::SetDiagnosticsReporter(std::unique_ptr<IDiagnosticReporter> reporter) {
+    m_reporter = std::move(reporter);
+}
+
+void SerializationContext::Reset() {
+    m_reporter.reset();
+}
+
 void SerializationContext::Mediate() {
     ResolveNonIntrusiveSerializeMethods();
 }
@@ -56,7 +66,5 @@ void SerializationContext::Log() {
     for (auto& [decl, info] : serializableClasses) {
         info->Log(output);
     }
-    for (auto& s : output) {
-        std::cout << s;
-    }
+    m_reporter->forward(output);
 }
