@@ -1,5 +1,13 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt
+  GIT_TAG        e3ddede6c4ee818825c4e5a6dfa1d384860c27d9) # 10.2.1
+FetchContent_MakeAvailable(fmt)
+
 set(HEADERS
         Diagnostics/DiagnosticMessage.h
         Diagnostics/IDiagnosticReporter.h
@@ -34,7 +42,7 @@ set(SOURCES
 
 add_library(sh_lib STATIC ${HEADERS} ${SOURCES})
 
-target_link_libraries(sh_lib PUBLIC common clangTooling clangBasic clangASTMatchers)
+target_link_libraries(sh_lib PUBLIC common clangTooling clangBasic clangASTMatchers fmt::fmt)
 
 target_include_directories(sh_lib SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/common)
 

@@ -4,10 +4,13 @@
 // Standard Library Headers
 // ==================================
 #include <cstdint>
+#include <vector>
+#include <string>
 
 // ==================================
 // Internal Headers
 // ==================================
+#include <Types/InfoTypes.h>
 
 // ==================================
 // Libtooling Headers
@@ -28,6 +31,8 @@ enum class SerializationErrorFlag : uint64_t {
     Error_SerializeMethodNotFound = 1 << 2, // No serialize-method is found (TODO: Reconsider, the compile may handle this)
     Error_SaveLoadOrderMismatched = 1 << 3 // In the split save-load methods, the order of operations is not the same
 };
+
+std::string toStringSep(SerializationErrorFlag flag);
 
 enum class SerializationInfoFlags : uint64_t {
     Info_NoInfo = 0,
@@ -53,19 +58,21 @@ inline SerializationErrorFlag operator&(SerializationErrorFlag lhs, Serializatio
 }
 
 class SerializationError {
+protected:
+    SerializableClassInfoWeakPtr m_class;
 public:
     SerializationErrorFlag m_flag = SerializationErrorFlag::Error_NoError;
     SerializationError() = default;
 
     // Used to create errors noe tied to a specific location
-    SerializationError(SerializationErrorFlag flag)
-            : m_flag{flag} {}
+    SerializationError(SerializationErrorFlag flag, SerializableClassInfoPtr& owningClass)
+            : m_flag{flag}, m_class{owningClass} {}
 
     virtual ~SerializationError() {}
     
     SerializationErrorFlag GetFlag() const { return m_flag; }
 
-    virtual std::string ToString() const = 0;
+    virtual void ToString(std::vector<std::string>& output) const = 0;
 };
 
 class SerializationError_MarkedFieldNotSerialized : public SerializationError {
@@ -83,9 +90,9 @@ public:
     //SerializationError_MarkedFieldNotSerialized(SerializeFie);
     
     // For normal serialization
-    SerializationError_MarkedFieldNotSerialized(SerializableFieldInfo& field, SerializeFunctionInfo& method);
+    SerializationError_MarkedFieldNotSerialized(SerializableFieldInfo& field, SerializeFunctionInfo& method, SerializableClassInfoPtr owningClass);
 
-    std::string ToString() const override;
+    void ToString(std::vector<std::string>& output) const override;
 
     ~SerializationError_MarkedFieldNotSerialized() override = default;
 };
@@ -102,9 +109,9 @@ private:
 
 public:
     // For split-member serialization
-    SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializeFunctionInfo& function);
+    SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializeFunctionInfo& function, SerializableClassInfoPtr owningClass);
 
-    std::string ToString() const override;
+    void ToString(std::vector<std::string>& output) const override;
 
     ~SerializationError_UnmarkedFieldSerialized() override = default;
 };
@@ -112,9 +119,9 @@ public:
 class SerializationError_SerializeMethodNotFound : public SerializationError {
 
 public:
-    std::string ToString() const override;
+    void ToString(std::vector<std::string>& output) const override;
 
-    SerializationError_SerializeMethodNotFound();
+    SerializationError_SerializeMethodNotFound(SerializableClassInfoPtr owningClass);
 
     ~SerializationError_SerializeMethodNotFound() override = default;
 };

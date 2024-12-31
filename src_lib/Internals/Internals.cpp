@@ -123,6 +123,8 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
     SerializationContext::Mediate();
 
     SerializationContext::Analyze();
+
+    SerializationContext::Log();
 }
 
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {

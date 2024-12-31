@@ -4,6 +4,7 @@
 // Standard Library Headers
 // ==================================
 #include <vector>
+#include <memory>
 
 // ==================================
 // Internal Headers
@@ -22,8 +23,8 @@
 // ==================================
 
 
-class SerializableClassInfo : public SerializationObject {
-    SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError; // Just the error flags set for the object.
+class SerializableClassInfo : public SerializationObject, public std::enable_shared_from_this<SerializableClassInfo> {
+    SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError; // Just the error flags set for the object. A summrary.
     SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
     std::vector<std::shared_ptr<SerializableFieldInfo>> m_fields; // Serializable fields inside of the class
@@ -53,4 +54,6 @@ public:
     bool HasSerializeMethod() const;
 
     void RunSerializeMethodAnalysis();
+
+    void Log(std::vector<std::string>& output);
 };

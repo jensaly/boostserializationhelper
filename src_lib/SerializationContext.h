@@ -3,6 +3,7 @@
 // ==================================
 // Standard Library Headers
 // ==================================
+#include <memory>
 
 // ==================================
 // Internal Headers
@@ -15,6 +16,7 @@
 // ==================================
 // Forward Declarations
 // ==================================
+class IDiagnosticReporter;
 
 class SerializationContext {
 public:
@@ -24,6 +26,10 @@ public:
 
     static void Log();
 
+    static void SetDiagnosticsReporter(std::unique_ptr<IDiagnosticReporter> reporter);
+
 private:
+    static std::unique_ptr<IDiagnosticReporter> m_reporter;
+
     static void ResolveNonIntrusiveSerializeMethods();
 };

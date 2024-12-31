@@ -1,11 +1,13 @@
 // ==================================
 // Standard Library Headers
 // ==================================
+#include <iostream>
 
 // ==================================
 // Internal Headers
 // ==================================
 #include "SerializationContext.h"
+#include <Diagnostics/IDiagnosticReporter.h>
 #include <Mediation/SerializableClassInfoMediator.h>
 #include <SerializationInfo/SerializableClassInfo.h>
 
@@ -50,7 +52,11 @@ void SerializationContext::Analyze() {
 
 void SerializationContext::Log() {
     auto& serializableClasses = SerializableClassInfoMediator::serializables;
+    std::vector<std::string> output;
     for (auto& [decl, info] : serializableClasses) {
-        info->RunSerializeMethodAnalysis();
+        info->Log(output);
+    }
+    for (auto& s : output) {
+        std::cout << s;
     }
 }

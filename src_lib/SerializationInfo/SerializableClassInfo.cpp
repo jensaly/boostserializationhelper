@@ -70,7 +70,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
     SerializationErrorFlag error = SerializationErrorFlag::Error_NoError;
 
     if (m_methodInfo == nullptr) {
-        auto error = std::make_unique<SerializationError_SerializeMethodNotFound>();
+        auto error = std::make_unique<SerializationError_SerializeMethodNotFound>(shared_from_this());
         SetError(std::move(error));
         return;
     }
@@ -86,7 +86,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
             auto& operation = *operation_it;
             // No serialize operations could be matched to the content of the class definition
             std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_MarkedFieldNotSerialized>(
-                *field, *m_methodInfo
+                *field, *m_methodInfo, shared_from_this()
             );
             SetError(std::move(error));
         }
@@ -98,9 +98,15 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
         });
         if (field_it == classFields.end()) {
             std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_UnmarkedFieldSerialized>(
-                *operationInfo, *m_methodInfo
+                *operationInfo, *m_methodInfo, shared_from_this()
             );
             SetError(std::move(error));
         }
+    }
+}
+
+void SerializableClassInfo::Log(std::vector<std::string>& output) {
+    for (auto& error : m_errors) {
+        error->ToString(output);
     }
 }
