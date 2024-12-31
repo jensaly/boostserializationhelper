@@ -23,6 +23,8 @@ class SerializationObject {
     unsigned int m_line = UINT32_MAX;
     unsigned int m_column = UINT32_MAX;
 public:
+    SerializationObject() = delete;
+
     SerializationObject(std::string declName, std::string filename, unsigned int line, unsigned int column);
 
     std::string GetName() const { return m_name; }
@@ -33,5 +35,5 @@ public:
 
     unsigned int GetColumn() const { return m_column; }
 
-    ~SerializationObject() {}
+    virtual ~SerializationObject() {}
 };

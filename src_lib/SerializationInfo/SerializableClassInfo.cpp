@@ -8,6 +8,7 @@
 #include <SerializationInfo/SerializableClassInfo.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
 #include <SerializationInfo/SerializeOperationInfo.h>
+#include <Types/InfoTypes.h>
 
 // ==================================
 // Libtooling Headers
@@ -78,29 +79,26 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
     auto classFields = GetFields();
 
     for (auto& field : classFields) {
-        auto operation_it = std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfo& operationInfo){ 
-            return field->GetName() == operationInfo.GetName();
+        auto operation_it = std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfoPtr& operationInfo){ 
+            return field->GetName() == operationInfo->GetName();
         });
         if (operation_it == methodContents.end()) {
             auto& operation = *operation_it;
             // No serialize operations could be matched to the content of the class definition
             std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_MarkedFieldNotSerialized>(
-                field->GetFilename(), field->GetLine(), field->GetColumn(),
-                operation.GetFilename(), operation.GetLine(), operation.GetColumn()
+                *field, *m_methodInfo
             );
             SetError(std::move(error));
         }
     }
 
     for (auto& operationInfo : methodContents) {
-        auto field_it = std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfo& fieldInfo){ 
-            return operationInfo == fieldInfo;
+        auto field_it = std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfoPtr& fieldInfo){ 
+            return operationInfo->GetName() == fieldInfo->GetName();
         });
         if (field_it == classFields.end()) {
-            auto& field = *field_it;
-            std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_>(
-                field->GetFilename(), field->GetLine(), field->GetColumn(),
-                operation.GetFilename(), operation.GetLine(), operation.GetColumn()
+            std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_UnmarkedFieldSerialized>(
+                *operationInfo, *m_methodInfo
             );
             SetError(std::move(error));
         }

@@ -17,6 +17,10 @@
 // Forward Declarations
 // ==================================
 
+class SerializeOperationInfo;
+class SerializableFieldInfo;
+class SerializeFunctionInfo;
+
 enum class SerializationErrorFlag : uint64_t {
     Error_NoError = 0,
     Error_MarkedFieldNotSerialized = 1 << 0, // A field marked for serialization is not present in the serialize/save/load method
@@ -72,24 +76,14 @@ private:
     std::string m_filenameSave = "";
     unsigned int m_saveLine;
     unsigned int m_saveColumn;
-    std::string m_filenameLoad = "";
-    unsigned int m_loadLine;
-    unsigned int m_loadColumn;
     bool m_split = false; // If set to false, there's a single serialize-function. 
 
 public:
     // For split-member serialization
-    SerializationError_MarkedFieldNotSerialized(
-        std::string filenameDecl, unsigned int declLine, unsigned int declColumn,
-        std::string filenameSave, unsigned int saveLine, unsigned int saveColumn,
-        std::string filenameLoad, unsigned int loadLine, unsigned int loadColumn
-    );
+    //SerializationError_MarkedFieldNotSerialized(SerializeFie);
     
     // For normal serialization
-    SerializationError_MarkedFieldNotSerialized(
-        std::string filenameDecl, unsigned int declLine, unsigned int declColumn,
-        std::string filenameSave, unsigned int saveLine, unsigned int saveColumn
-    );
+    SerializationError_MarkedFieldNotSerialized(SerializableFieldInfo& field, SerializeFunctionInfo& method);
 
     std::string ToString() const override;
 
@@ -104,14 +98,11 @@ private:
     std::string m_filenameSave = "";
     unsigned int m_saveLine;
     unsigned int m_saveColumn;
-    std::string m_filenameLoad = "";
-    unsigned int m_loadLine;
-    unsigned int m_loadColumn;
     bool m_split = false; // If set to false, there's a single serialize-function. 
 
 public:
     // For split-member serialization
-    SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializableFieldInfo& field);
+    SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializeFunctionInfo& function);
 
     std::string ToString() const override;
 
@@ -121,6 +112,8 @@ public:
 class SerializationError_SerializeMethodNotFound : public SerializationError {
 
 public:
+    std::string ToString() const override;
+
     SerializationError_SerializeMethodNotFound();
 
     ~SerializationError_SerializeMethodNotFound() override = default;

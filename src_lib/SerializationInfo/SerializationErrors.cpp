@@ -9,6 +9,7 @@
 #include <SerializationInfo/SerializationErrors.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
 #include <SerializationInfo/SerializeOperationInfo.h>
+#include <SerializationInfo/SerializeFunctionInfo.h>
 
 // ==================================
 // Libtooling Headers
@@ -18,45 +19,40 @@
 // Forward Declarations
 // ==================================
 
-SerializationError_MarkedFieldNotSerialized::SerializationError_MarkedFieldNotSerialized(
-    std::string filenameDecl, unsigned int declLine, unsigned int declColumn,
-    std::string filenameSave, unsigned int saveLine, unsigned int saveColumn,
-    std::string filenameLoad, unsigned int loadLine, unsigned int loadColumn
-)
-        : m_filenameDecl{filenameDecl}, m_declLine{declLine}, m_declColumn{declColumn},
-        m_filenameSave{filenameSave}, m_saveLine{saveLine}, m_saveColumn{saveColumn},
-        m_filenameLoad{filenameLoad}, m_loadLine{loadLine}, m_loadColumn{loadColumn},
-        SerializationError(SerializationErrorFlag::Error_MarkedFieldNotSerialized)
-{
-    m_split = true;
-}
-
 // For normal serialization
 SerializationError_MarkedFieldNotSerialized::SerializationError_MarkedFieldNotSerialized(
-    std::string filenameDecl, unsigned int declLine, unsigned int declColumn,
-    std::string filenameSave, unsigned int saveLine, unsigned int saveColumn
-)
-        : m_filenameDecl{filenameDecl}, m_declLine{declLine}, m_declColumn{declColumn},
-        m_filenameSave{filenameSave}, m_saveLine{saveLine}, m_saveColumn{saveColumn},
-        m_filenameLoad{""}, m_loadLine{UINT32_MAX}, m_loadColumn{UINT32_MAX},
+    SerializableFieldInfo& field, SerializeFunctionInfo& method)
+        : m_filenameDecl{field.GetFilename()}, m_declLine{field.GetLine()}, m_declColumn{field.GetColumn()},
+        m_filenameSave{method.GetFilename()}, m_saveLine{method.GetLine()}, m_saveColumn{method.GetColumn()},
         SerializationError(SerializationErrorFlag::Error_MarkedFieldNotSerialized)
 {
     m_split = false;
 }
 
 std::string SerializationError_MarkedFieldNotSerialized::ToString() const {
-    return "Testing";
+    throw std::logic_error("Not implemented");
 }
 
 SerializationError_UnmarkedFieldSerialized::SerializationError_UnmarkedFieldSerialized(
-    SerializeOperationInfo& operation, SerializableFieldInfo& field) 
+    SerializeOperationInfo& operation, SerializeFunctionInfo& function) 
         : SerializationError(SerializationErrorFlag::Error_UnmarkedFieldSerialized)
 {
-    
+    m_declLine = function.GetLine();
+    m_saveLine = operation.GetLine();
+    m_declColumn = function.GetColumn();
+    m_saveColumn = operation.GetColumn();
+}
+
+std::string SerializationError_UnmarkedFieldSerialized::ToString() const {
+    throw std::logic_error("Not implemented");
 }
 
 SerializationError_SerializeMethodNotFound::SerializationError_SerializeMethodNotFound() 
         : SerializationError(SerializationErrorFlag::Error_SerializeMethodNotFound)
 {
 
+}
+
+std::string SerializationError_SerializeMethodNotFound::ToString() const {
+    throw std::logic_error("Not implemented");
 }

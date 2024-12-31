@@ -10,6 +10,7 @@
 // ==================================
 #include <Types/InfoTypes.h>
 #include <SerializationInfo/SerializationErrors.h>
+#include <SerializationInfo/SerializationObject.h>
 
 // ==================================
 // Libtooling Headers
@@ -27,23 +28,23 @@ public:
     virtual ~ISerializeFunctionInfo() {}
 };
 
-class SerializeFunctionInfo{
+class SerializeFunctionInfo : public SerializationObject {
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError;
     SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
     clang::FunctionDecl* m_decl = nullptr;
     
-    std::vector<SerializeOperationInfo> m_operationsInfo;
+    std::vector<SerializeOperationInfoPtr> m_operationsInfo;
 
 public:
     SerializationErrorFlag GetErrors() const { return m_errorFlags; }
-    std::vector<SerializeOperationInfo> const& GetFields() const { return m_operationsInfo; };
+    std::vector<SerializeOperationInfoPtr> const& GetFields() const { return m_operationsInfo; };
 
-    SerializeFunctionInfo(clang::FunctionDecl* decl);
+    SerializeFunctionInfo(std::string funcName, std::string filename, unsigned int line, unsigned int column);
 
     virtual ~SerializeFunctionInfo();
 
-    void AddSerializableField(SerializeOperationInfo operationInfo);
+    void AddSerializableField(SerializeOperationInfoPtr&& operationInfo);
 
     void SetError(SerializationErrorFlag error);
 
@@ -58,7 +59,7 @@ public:
 class SerializeFunctionInfo_Intrusive : public SerializeFunctionInfo {
 public:
     SerializeFunctionInfo_Intrusive() = delete;
-    SerializeFunctionInfo_Intrusive(clang::FunctionDecl* decl);
+    SerializeFunctionInfo_Intrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column);
     ~SerializeFunctionInfo_Intrusive() override = default;
 };
 
@@ -66,6 +67,6 @@ public:
 class SerializeFunctionInfo_NonIntrusive : public SerializeFunctionInfo {
 public:
     SerializeFunctionInfo_NonIntrusive() = delete;
-    SerializeFunctionInfo_NonIntrusive(clang::FunctionDecl* decl);
+    SerializeFunctionInfo_NonIntrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column);
     ~SerializeFunctionInfo_NonIntrusive() override = default;
 };

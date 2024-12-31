@@ -9,6 +9,7 @@
 // ==================================
 // Internal Headers
 // ==================================
+#include <Utils/Utils.h>
 
 // ==================================
 // Libtooling Headers
@@ -23,12 +24,12 @@
 class InfoFactory {
 public:
     template<class Output>
-    static std::shared_ptr<Output> Create(clang::ASTContext& context, clang::Decl* Declaration) {
+    static std::shared_ptr<Output> Create(clang::ASTContext& context, clang::NamedDecl* Declaration) {
         auto name = Declaration->getNameAsString();
         std::string filename;
         unsigned int line, column;
-        Utils::GetFullLocaionOfDecl(Context, Declaration, filename, line, column);
+        Utils::GetFullLocaionOfDecl(context, Declaration, filename, line, column);
 
-        auto thisClassInfo = std::make_shared<Output>(name, filename, line, column);
+        return std::make_shared<Output>(name, filename, line, column);
     }
 };

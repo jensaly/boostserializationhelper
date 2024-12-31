@@ -39,7 +39,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         return true;
     }
     
-    auto thisClassInfo = InfoFactory::Create<SerializableClassInfo>(Context, Declaration);
+    auto thisClassInfo = InfoFactory::Create<SerializableClassInfo>(*Context, Declaration);
     
     DiscoveryHelper::FetchSerializableMembers(*Context, Declaration, thisClassInfo);
 
@@ -50,7 +50,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     else {
         auto serializeMethod = serializeMethodTemplate->getAsFunction();
         // Intrusive method found. Set it.
-        auto intrusiveSerializeMethodInfo = std::make_shared<SerializeFunctionInfo_Intrusive>(serializeMethod);
+        auto intrusiveSerializeMethodInfo = InfoFactory::Create<SerializeFunctionInfo_Intrusive>(*Context, serializeMethod);
         auto body = serializeMethod->getBody();
 
         SerializableStmtVisitor visitor{Context};
@@ -58,7 +58,7 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
         auto methodContents = visitor.GetOperations();
 
         for (auto& field : methodContents) {
-            intrusiveSerializeMethodInfo->AddSerializableField(SerializeOperationInfo(field));
+            intrusiveSerializeMethodInfo->AddSerializableField(std::move(field));
         };
 
         thisClassInfo->SetSerializeMethodInfo(intrusiveSerializeMethodInfo);
@@ -85,18 +85,19 @@ bool FindSerializableClassVisitor::VisitFunctionDecl(FunctionDecl *FuncDecl) {
     if (FuncDecl->getNumParams() < 2) { // Free serialize methods have 3 parameters, second is type
         return true;
     }
-    
-    auto FuncDecl_Ptr = std::make_shared<SerializeFunctionInfo_NonIntrusive>(FuncDecl);
+
+    auto FuncDecl_Ptr = InfoFactory::Create<SerializeFunctionInfo_NonIntrusive>(*Context, FuncDecl);
     
     auto body = FuncDecl->getBody();
 
-    SerializableStmtVisitor visitor{};
+    SerializableStmtVisitor visitor{Context};
     visitor.TraverseStmt(body);
-    auto methodContents = visitor.GetSerializeContents();
+    auto methodContents = visitor.GetOperations();
 
     for (auto& field : methodContents) {
-        FuncDecl_Ptr->AddSerializableField(SerializeOperationInfo(field));
+        FuncDecl_Ptr->AddSerializableField(std::move(field));
     }
+    // methodContents now useless.
 
     SerializeFunctionInfoMediator::AddSerializeDecl(FuncDecl, std::move(FuncDecl_Ptr));
     return true;
@@ -141,7 +142,7 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
         const Expr* lhs = op->getLHS();
         const Expr* rhs = op->getRHS();
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
-            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(Context, rhs_decl->getMemberDecl());
+            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl->getMemberDecl());
             m_serializeContents.push_back(std::move(operatonInfo));
         }
     }

@@ -16,16 +16,18 @@
 // Forward Declarations
 // ==================================
 
-SerializeFunctionInfo::SerializeFunctionInfo(clang::FunctionDecl* decl) : m_decl{decl} {
-    
+SerializeFunctionInfo::SerializeFunctionInfo(std::string className, std::string filename, unsigned int line, unsigned int column)
+        : SerializationObject(className, filename, line, column)
+{
+
 }
 
 SerializeFunctionInfo::~SerializeFunctionInfo() {
 
 }
 
-void SerializeFunctionInfo::AddSerializableField(SerializeOperationInfo operationInfo) {
-    m_operationsInfo.push_back(operationInfo);
+void SerializeFunctionInfo::AddSerializableField(SerializeOperationInfoPtr&& operationInfo) {
+    m_operationsInfo.push_back(std::move(operationInfo));
 }
 
 void SerializeFunctionInfo::SetError(SerializationErrorFlag error) {
@@ -38,10 +40,14 @@ bool SerializeFunctionInfo::HasError(SerializationErrorFlag error) const {
     return true;
 }
 
-SerializeFunctionInfo_Intrusive::SerializeFunctionInfo_Intrusive(clang::FunctionDecl* decl) : SerializeFunctionInfo(decl) {
+SerializeFunctionInfo_Intrusive::SerializeFunctionInfo_Intrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column)
+        : SerializeFunctionInfo(funcName, filename, line, column)
+{
 
 }
 
-SerializeFunctionInfo_NonIntrusive::SerializeFunctionInfo_NonIntrusive(clang::FunctionDecl* decl) : SerializeFunctionInfo(decl)  {
+SerializeFunctionInfo_NonIntrusive::SerializeFunctionInfo_NonIntrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column)
+        : SerializeFunctionInfo(funcName, filename, line, column)
+{
     
 }

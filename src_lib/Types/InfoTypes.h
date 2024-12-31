@@ -14,5 +14,5 @@ using SerializeFunctionInfoPtr = std::shared_ptr<SerializeFunctionInfo>;
 using SerializeFunctionInfoWeakPtr = std::weak_ptr<const SerializeFunctionInfo>;
 using SerializeOperationInfoPtr = std::shared_ptr<SerializeOperationInfo>;
 using SerializeOperationInfoWeakPtr = std::weak_ptr<const SerializeOperationInfo>;
-using SerializableFieldInfoInfoPtr = std::shared_ptr<SerializableFieldInfo>;
-using SerializableFieldInfoInfoWeakPtr = std::weak_ptr<const SerializableFieldInfo>;
+using SerializableFieldInfoPtr = std::shared_ptr<SerializableFieldInfo>;
+using SerializableFieldInfoWeakPtr = std::weak_ptr<const SerializableFieldInfo>;
