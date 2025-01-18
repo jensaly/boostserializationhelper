@@ -70,3 +70,11 @@ public:
     SerializeFunctionInfo_NonIntrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column);
     ~SerializeFunctionInfo_NonIntrusive() override = default;
 };
+
+class SplitFunctionInfo_Intrusive : public SerializationObject {
+    SerializeFunctionInfoPtr m_save = nullptr;
+    SerializeFunctionInfoPtr m_load;
+
+public:
+    
+};

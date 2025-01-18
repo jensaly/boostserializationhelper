@@ -130,3 +130,12 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
     serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
     return true;
 }
+
+bool DiscoveryHelper::IsSerializationSplit(clang::ASTContext& context, const clang::Decl* serializable, SerializableClassInfoPtr classInfo) {
+    auto& sm = context.getSourceManager();
+    SourceRange Range = serializable->getSourceRange();
+    LangOptions LangOpts;
+
+    
+    return true;
+}

@@ -43,6 +43,8 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     
     DiscoveryHelper::FetchSerializableMembers(*Context, Declaration, thisClassInfo);
 
+    DiscoveryHelper::IsSerializationSplit(*Context, Declaration, thisClassInfo);
+
     FunctionTemplateDecl* serializeMethodTemplate = nullptr;
     if (!DiscoveryHelper::FetchSerializeMethod(*Context, Declaration, serializeMethodTemplate)) {
         // No intrusive serialize method exists. One may be set during mediation.

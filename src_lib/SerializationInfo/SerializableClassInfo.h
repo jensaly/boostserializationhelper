@@ -29,7 +29,7 @@ class SerializableClassInfo : public SerializationObject, public std::enable_sha
 
     std::vector<std::shared_ptr<SerializableFieldInfo>> m_fields; // Serializable fields inside of the class
 
-    std::shared_ptr<SerializeFunctionInfo> m_methodInfo = nullptr; // Pointer to its serialize-function information
+    SerializeFunctionInfoPtr m_methodInfo = nullptr; // Pointer to its serialize-function information
 
     std::vector<std::unique_ptr<SerializationError>> m_errors;
 

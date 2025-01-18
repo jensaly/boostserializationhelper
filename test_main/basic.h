@@ -165,3 +165,59 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
     ASSERT_FALSE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_NoError));
 }
 
+TEST_F(SH_Tests, SplitAnalysis) {
+    SerializationContext::SetDiagnosticsReporter(std::make_unique<TestDiagnosticReporter>("SplitSingleTUTests.log"));
+    std::string file = "./projects/split/split_class.hpp";
+    std::string code = GetCodeFromSourceFile(file);
+    std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
+
+    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+
+    auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
+
+    ASSERT_EQ(serializable_classes.size(), 7);
+
+    auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized");
+    auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved");
+    auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded");
+    auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved");
+    auto class_Split_MarkedMemberNotSaved = GetClassFromVector(serializable_classes, "Split_MarkedMemberNotSaved");
+    auto class_Split_WrongOrder_TypeOk = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeOk");
+    auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong");
+
+    ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
+    ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
+    ASSERT_FALSE(class_Split_OneMemberNotLoaded.expired());
+    ASSERT_FALSE(class_Split_UnmarkedMemberSaved.expired());
+    ASSERT_FALSE(class_Split_MarkedMemberNotSaved.expired());
+    ASSERT_FALSE(class_Split_WrongOrder_TypeOk.expired());
+    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
+
+    auto class_Split_AllMembersSerialized_Ptr = class_Split_AllMembersSerialized.lock();
+    auto class_Split_OneMemberNotSaved_Ptr = class_Split_OneMemberNotSaved.lock();
+    auto class_Split_OneMemberNotLoaded_Ptr = class_Split_OneMemberNotLoaded.lock();
+    auto class_Split_UnmarkedMemberSaved_Ptr = class_Split_UnmarkedMemberSaved.lock();
+    auto class_Split_MarkedMemberNotSaved_Ptr = class_Split_MarkedMemberNotSaved.lock();
+    auto class_Split_WrongOrder_TypeOk_Ptr = class_Split_WrongOrder_TypeOk.lock();
+    auto class_Split_WrongOrder_TypeWrong_Ptr = class_Split_WrongOrder_TypeWrong.lock();
+
+    ASSERT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_UnmarkedMemberSaved_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    ASSERT_FALSE(class_Split_UnmarkedMemberSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_MarkedMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Split_MarkedMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    ASSERT_FALSE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+}
