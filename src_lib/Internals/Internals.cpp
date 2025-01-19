@@ -43,27 +43,14 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
     
     DiscoveryHelper::FetchSerializableMembers(*Context, Declaration, thisClassInfo);
 
-    DiscoveryHelper::IsSerializationSplit(*Context, Declaration, thisClassInfo);
+    // Two separate paths for whether the class is split-serialized or not.
 
     FunctionTemplateDecl* serializeMethodTemplate = nullptr;
-    if (!DiscoveryHelper::FetchSerializeMethod(*Context, Declaration, serializeMethodTemplate)) {
+    if (!DiscoveryHelper::FetchSerializeMethod(*Context, Declaration, thisClassInfo)) {
         // No intrusive serialize method exists. One may be set during mediation.
     }
     else {
-        auto serializeMethod = serializeMethodTemplate->getAsFunction();
-        // Intrusive method found. Set it.
-        auto intrusiveSerializeMethodInfo = InfoFactory::Create<SerializeFunctionInfo_Intrusive>(*Context, serializeMethod);
-        auto body = serializeMethod->getBody();
-
-        SerializableStmtVisitor visitor{Context};
-        visitor.TraverseStmt(body);
-        auto methodContents = visitor.GetOperations();
-
-        for (auto& field : methodContents) {
-            intrusiveSerializeMethodInfo->AddSerializableField(std::move(field));
-        };
-
-        thisClassInfo->SetSerializeMethodInfo(intrusiveSerializeMethodInfo);
+        // Intrusive serialize or save/load methods found.
     }
 
     SerializableClassInfoMediator::AddSerializableDecl(Declaration, std::move(thisClassInfo));
@@ -156,3 +143,22 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 const std::vector<SerializeOperationInfoPtr> SerializableStmtVisitor::GetOperations() {
     return m_serializeContents;
 }
+
+SaveStmtVisitor::SaveStmtVisitor(clang::ASTContext* context)
+        : SerializableStmtVisitor(context)
+{
+
+}
+
+bool SaveStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
+    if (op->getOpcode() == BO_And) {
+        const Expr* lhs = op->getLHS();
+        const Expr* rhs = op->getRHS();
+        if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
+            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
+            m_serializeContents.push_back(std::move(operatonInfo));
+        }
+    }
+    return true;
+}
+

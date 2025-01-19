@@ -124,14 +124,14 @@ struct SERIALIZABLE Split_UnmarkedMemberSaved {
 
 // Order of elements in save/load are correct, but a marked member is not serialized
 // Regression test
-struct SERIALIZABLE Split_MarkedMemberNotSaved {
+struct SERIALIZABLE Split_MarkedMemberNotSavedOrLoaded {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_MarkedMemberNotSaved(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_MarkedMemberNotSavedOrLoaded(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_MarkedMemberNotSaved() = default;
+    Split_MarkedMemberNotSavedOrLoaded() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const

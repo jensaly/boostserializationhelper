@@ -22,7 +22,7 @@ std::vector<std::shared_ptr<SerializableFieldInfo>> const& SerializableClassInfo
     return m_fields;
 }
 
-bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo) {
+bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<ISerializeFunctionInfo> serializeFunctionInfo) {
     if (m_methodInfo != nullptr) {
         return false;
     }
@@ -75,34 +75,7 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
         return;
     }
 
-    auto methodContents = m_methodInfo->GetFields();
-    auto classFields = GetFields();
-
-    for (auto& field : classFields) {
-        auto operation_it = std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfoPtr& operationInfo){ 
-            return field->GetName() == operationInfo->GetName();
-        });
-        if (operation_it == methodContents.end()) {
-            auto& operation = *operation_it;
-            // No serialize operations could be matched to the content of the class definition
-            std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_MarkedFieldNotSerialized>(
-                *field, *m_methodInfo, shared_from_this()
-            );
-            SetError(std::move(error));
-        }
-    }
-
-    for (auto& operationInfo : methodContents) {
-        auto field_it = std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfoPtr& fieldInfo){ 
-            return operationInfo->GetName() == fieldInfo->GetName();
-        });
-        if (field_it == classFields.end()) {
-            std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_UnmarkedFieldSerialized>(
-                *operationInfo, *m_methodInfo, shared_from_this()
-            );
-            SetError(std::move(error));
-        }
-    }
+    m_methodInfo->RunChecks(shared_from_this());
 }
 
 void SerializableClassInfo::Log(std::vector<std::string>& output) {

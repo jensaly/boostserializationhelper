@@ -105,6 +105,40 @@ void SerializationError_UnmarkedFieldSerialized::ToString(std::vector<std::strin
     ));
 }
 
+SerializationError_SaveLoadOrderMismatched::SerializationError_SaveLoadOrderMismatched(
+    SerializeOperationInfo& loadOperation, SerializeOperationInfo& saveOperation, SerializeFunctionInfo& saveFunction, SerializeFunctionInfo& loadFunction, SerializableClassInfoPtr owningClass) 
+        : SerializationError(SerializationErrorFlag::Error_SaveLoadOrderMismatched, owningClass)
+{
+    m_fieldName = loadOperation.GetName();
+    m_filenameLoad = loadOperation.GetFilename();
+    m_loadLine = loadOperation.GetLine();
+    m_loadColumn = loadOperation.GetColumn();
+
+    m_filenameSave = saveOperation.GetFilename();
+    m_saveLine = saveOperation.GetLine();
+    m_saveColumn = saveOperation.GetColumn();
+}
+
+void SerializationError_SaveLoadOrderMismatched::ToString(std::vector<std::string>& output) const {
+    constexpr std::string_view format = 
+        "[E] {flag}: Mistmatch in save/load-order for '{field}' in {class}. Save operation: '{saveFile}', {savePos}. Load operation: ('{loadFile}', {loadPos})";
+
+    auto classPtr = m_class.lock();
+    // TODO: Check expired!
+
+    std::string loadPos = fmt::format("({}, {})", m_loadLine, m_loadColumn);
+    std::string savePos = fmt::format("({}, {})", m_saveLine, m_saveColumn);
+    output.push_back(fmt::format(format, 
+        fmt::arg("flag", toStringSep(m_flag)),
+        fmt::arg("field", m_fieldName),
+        fmt::arg("class", classPtr->GetClassName()),
+        fmt::arg("saveFile", m_filenameSave),
+        fmt::arg("savePos", savePos),
+        fmt::arg("loadFile", m_filenameLoad),
+        fmt::arg("loadPos", loadPos)
+    ));
+}
+
 SerializationError_SerializeMethodNotFound::SerializationError_SerializeMethodNotFound(SerializableClassInfoPtr owningClass) 
         : SerializationError(SerializationErrorFlag::Error_SerializeMethodNotFound, owningClass)
 {

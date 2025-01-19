@@ -58,8 +58,10 @@ private:
 };
 
 class DiscoveryHelper {
+private:
+
 public:
-    static bool FetchSerializeMethod(clang::ASTContext& context, const clang::CXXRecordDecl* serializable, /* out */ clang::FunctionTemplateDecl*& serializeDecl);
-    static void FetchSerializableMembers(clang::ASTContext& context, const clang::CXXRecordDecl* serializable, SerializableClassInfoPtr classInfo);
-    static bool IsSerializationSplit(clang::ASTContext& context, const clang::Decl* serializable, SerializableClassInfoPtr classInfo);
+    static bool FetchSerializeMethod(clang::ASTContext& context, const clang::CXXRecordDecl* serializableClass, SerializableClassInfoPtr classInfo);
+    static void FetchSerializableMembers(clang::ASTContext& context, const clang::CXXRecordDecl* serializableClass, SerializableClassInfoPtr classInfo);
+    static bool IsSerializationSplit(clang::ASTContext& context, const clang::CXXRecordDecl* serializable);
 };

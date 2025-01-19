@@ -130,7 +130,7 @@ TEST(Test_Split_MarkedMemberNotSaved, ValueTest) {
 
         boost::archive::text_oarchive ar(ifs);
 
-        Split_MarkedMemberNotSaved obj(14, 14, '1');
+        Split_MarkedMemberNotSavedOrLoaded obj(14, 14, '1');
 
         EXPECT_NO_THROW(ar << obj);
     }
@@ -140,7 +140,7 @@ TEST(Test_Split_MarkedMemberNotSaved, ValueTest) {
 
         boost::archive::text_iarchive ar(fs);
 
-        Split_MarkedMemberNotSaved obj;
+        Split_MarkedMemberNotSavedOrLoaded obj;
 
         EXPECT_NO_THROW(ar >> obj);
 

@@ -24,11 +24,11 @@
 // Interface for handling of inline, non-intrusive and split serialize methods
 class ISerializeFunctionInfo {
 public:
-    virtual void RunChecks(clang::FunctionTemplateDecl* serializeMethod, SerializableClassInfoPtr classInfo) = 0;
+    virtual void RunChecks(SerializableClassInfoPtr classInfo) = 0;
     virtual ~ISerializeFunctionInfo() {}
 };
 
-class SerializeFunctionInfo : public SerializationObject {
+class SerializeFunctionInfo : public ISerializeFunctionInfo, public SerializationObject {
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError;
     SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
 
@@ -44,15 +44,15 @@ public:
 
     virtual ~SerializeFunctionInfo();
 
+    void RunChecks(SerializableClassInfoPtr classInfo) override;
+
     void AddSerializableField(SerializeOperationInfoPtr&& operationInfo);
 
     void SetError(SerializationErrorFlag error);
 
     bool HasError(SerializationErrorFlag error) const;
 
-    void GenerateSerializeMethodInfo();
-
-    void RunSerializeMethodAnalysis();
+    friend class SplitFunctionInfo_Intrusive;
 };
 
 // Created by CXXRecordDecl during discovery, immediately associated
@@ -71,10 +71,15 @@ public:
     ~SerializeFunctionInfo_NonIntrusive() override = default;
 };
 
-class SplitFunctionInfo_Intrusive : public SerializationObject {
+// Wrapper that implements the same interface as the single serialize-function, but actually stores two as SerializationObjects
+class SplitFunctionInfo_Intrusive : public ISerializeFunctionInfo {
     SerializeFunctionInfoPtr m_save = nullptr;
-    SerializeFunctionInfoPtr m_load;
+    SerializeFunctionInfoPtr m_load = nullptr;
 
 public:
-    
+    SplitFunctionInfo_Intrusive(SerializeFunctionInfoPtr&& save, SerializeFunctionInfoPtr&& load);
+
+    virtual ~SplitFunctionInfo_Intrusive();
+
+    void RunChecks(SerializableClassInfoPtr classInfo) override;
 };

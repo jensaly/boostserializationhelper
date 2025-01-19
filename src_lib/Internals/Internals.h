@@ -42,6 +42,24 @@ class SerializableStmtVisitor : public clang::RecursiveASTVisitor<SerializableSt
   clang::ASTContext *Context;
 public:
   explicit SerializableStmtVisitor(clang::ASTContext* context);
-  bool VisitBinaryOperator(const clang::BinaryOperator *op);
+  virtual bool VisitBinaryOperator(const clang::BinaryOperator *op);
+  const std::vector<SerializeOperationInfoPtr> GetOperations();
+};
+
+class SaveStmtVisitor : public SerializableStmtVisitor{
+  std::vector<SerializeOperationInfoPtr> m_serializeContents;
+  clang::ASTContext *Context;
+public:
+  explicit SaveStmtVisitor(clang::ASTContext* context);
+  bool VisitBinaryOperator(const clang::BinaryOperator *op) override;
+  const std::vector<SerializeOperationInfoPtr> GetOperations();
+};
+
+class LoadStmtVisitor : public SerializableStmtVisitor{
+  std::vector<SerializeOperationInfoPtr> m_serializeContents;
+  clang::ASTContext *Context;
+public:
+  explicit LoadStmtVisitor(clang::ASTContext* context);
+  bool VisitBinaryOperator(const clang::BinaryOperator *op) override;
   const std::vector<SerializeOperationInfoPtr> GetOperations();
 };

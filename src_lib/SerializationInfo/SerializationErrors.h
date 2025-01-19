@@ -102,20 +102,40 @@ class SerializationError_UnmarkedFieldSerialized : public SerializationError {
 private:
     std::string m_fieldName = ";;UNKNOWN;;";
     std::string m_filenameDecl = ";;UNKNOWN;;";
-    unsigned int m_declLine; // Max value indicates that this error isn't related to a specific line
-    unsigned int m_declColumn; // Max value indicates that this error isn't related to a specific column
+    unsigned int m_declLine;
+    unsigned int m_declColumn;
     std::string m_filenameSave = ";;UNKNOWN;;";
     unsigned int m_saveLine;
     unsigned int m_saveColumn;
-    bool m_split = false; // If set to false, there's a single serialize-function. 
+    std::string m_filenameLoad = ";;UNKNOWN;;";
+    unsigned int m_loadLine;
+    unsigned int m_loadColumn;
 
 public:
-    // For split-member serialization
     SerializationError_UnmarkedFieldSerialized(SerializeOperationInfo& operation, SerializeFunctionInfo& function, SerializableClassInfoPtr owningClass);
 
     void ToString(std::vector<std::string>& output) const override;
 
     ~SerializationError_UnmarkedFieldSerialized() override = default;
+};
+
+class SerializationError_SaveLoadOrderMismatched : public SerializationError {
+private:
+    std::string m_fieldName = ";;UNKNOWN;;";
+    std::string m_filenameSave = ";;UNKNOWN;;";
+    unsigned int m_saveLine;
+    unsigned int m_saveColumn;
+    std::string m_filenameLoad = ";;UNKNOWN;;";
+    unsigned int m_loadLine;
+    unsigned int m_loadColumn; 
+
+public:
+    // For split-member serialization
+    SerializationError_SaveLoadOrderMismatched(SerializeOperationInfo& loadOperation, SerializeOperationInfo& saveOperation, SerializeFunctionInfo& saveFunction, SerializeFunctionInfo& loadFunction, SerializableClassInfoPtr owningClass);
+
+    void ToString(std::vector<std::string>& output) const override;
+
+    ~SerializationError_SaveLoadOrderMismatched() override = default;
 };
 
 class SerializationError_SerializeMethodNotFound : public SerializationError {
