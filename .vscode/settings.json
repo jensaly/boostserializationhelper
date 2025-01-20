@@ -94,6 +94,7 @@
         "ranges": "cpp",
         "span": "cpp",
         "typeindex": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "*.def": "cpp"
     }
 }

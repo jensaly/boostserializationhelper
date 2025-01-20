@@ -11,14 +11,14 @@
 // save or load methods during compile time.
 
 // Save and load correctly implemented intrusively
-struct SERIALIZABLE Split_AllMembersSerialized {
+struct SERIALIZABLE Split_AllMembersSerialized_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_AllMembersSerialized(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_AllMembersSerialized_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_AllMembersSerialized() = default;
+    Split_AllMembersSerialized_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -39,14 +39,14 @@ struct SERIALIZABLE Split_AllMembersSerialized {
 };
 
 
-struct SERIALIZABLE Split_OneMemberNotSaved {
+struct SERIALIZABLE Split_OneMemberNotSaved_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_OneMemberNotSaved(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_OneMemberNotSaved_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_OneMemberNotSaved() = default;
+    Split_OneMemberNotSaved_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -66,14 +66,14 @@ struct SERIALIZABLE Split_OneMemberNotSaved {
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
-struct SERIALIZABLE Split_OneMemberNotLoaded {
+struct SERIALIZABLE Split_OneMemberNotLoaded_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_OneMemberNotLoaded(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_OneMemberNotLoaded_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_OneMemberNotLoaded() = default;
+    Split_OneMemberNotLoaded_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -95,14 +95,14 @@ struct SERIALIZABLE Split_OneMemberNotLoaded {
 
 // Order of elements in save/load are correct, but an unmarked member is serialized
 // Regression test
-struct SERIALIZABLE Split_UnmarkedMemberSaved {
+struct SERIALIZABLE Split_UnmarkedMemberSaved_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     char m_c = 'c';
 
-    Split_UnmarkedMemberSaved(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_UnmarkedMemberSaved_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_UnmarkedMemberSaved() = default;
+    Split_UnmarkedMemberSaved_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -124,14 +124,14 @@ struct SERIALIZABLE Split_UnmarkedMemberSaved {
 
 // Order of elements in save/load are correct, but a marked member is not serialized
 // Regression test
-struct SERIALIZABLE Split_MarkedMemberNotSavedOrLoaded {
+struct SERIALIZABLE Split_MarkedMemberNotSavedOrLoaded_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_MarkedMemberNotSavedOrLoaded(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_MarkedMemberNotSavedOrLoaded_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_MarkedMemberNotSavedOrLoaded() = default;
+    Split_MarkedMemberNotSavedOrLoaded_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -149,14 +149,14 @@ struct SERIALIZABLE Split_MarkedMemberNotSavedOrLoaded {
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
-struct SERIALIZABLE Split_WrongOrder_TypeOk {
+struct SERIALIZABLE Split_WrongOrder_TypeOk_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE int m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_WrongOrder_TypeOk(int a, int b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_WrongOrder_TypeOk_Ampersand(int a, int b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_WrongOrder_TypeOk() = default;
+    Split_WrongOrder_TypeOk_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const
@@ -176,14 +176,14 @@ struct SERIALIZABLE Split_WrongOrder_TypeOk {
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
-struct SERIALIZABLE Split_WrongOrder_TypeWrong {
+struct SERIALIZABLE Split_WrongOrder_TypeWrong_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     SERIALIZABLE char m_c = 'c';
 
-    Split_WrongOrder_TypeWrong(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_WrongOrder_TypeWrong_Ampersand(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_WrongOrder_TypeWrong() = default;
+    Split_WrongOrder_TypeWrong_Ampersand() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const

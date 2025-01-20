@@ -35,9 +35,8 @@ public:
 
     template<class Output>
     static std::shared_ptr<Output> Create(clang::ASTContext& context, const clang::MemberExpr* expr) {
-        clang::LangOptions opts;
-        std::string exprName = expr->getMemberNameInfo().getAsString();
         // exprName will be either [object variable name].expr or just expr.
+        std::string exprName = expr->getMemberNameInfo().getAsString();
         std::string exprFileName;
         unsigned int exprLine, exprColumn;
         Utils::GetFullLocaionOfExpr(context, expr, exprFileName, exprLine, exprColumn);

@@ -129,14 +129,41 @@ SerializableStmtVisitor::SerializableStmtVisitor(clang::ASTContext* context)
 }
 
 bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
-    if (op->getOpcode() == BO_And) {
-        const Expr* lhs = op->getLHS();
-        const Expr* rhs = op->getRHS();
+    auto operation = op->getOpcode();
+    // TODO: Replace with a switch
+    // TODO: Nullptr check, shall it always be bad?
+    const Expr* lhs = op->getLHS();
+    const Expr* rhs = op->getRHS();
+    if (lhs == nullptr || rhs == nullptr) {
+            
+    }
+    // TODO: Check that lhs is the archive, otherwise this isn't a serialization operation
+    //if (lhs != ar)
+
+    SerializeOperationInfoPtr operationInfo;
+    if (operation == BO_And) {
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
-            auto operatonInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
-            m_serializeContents.push_back(std::move(operatonInfo));
+            operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
+            operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_And);
         }
     }
+    else if (operation == BinaryOperatorKind::BO_Shl) {
+        if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
+            operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
+            operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_Shl);
+        }
+    }
+    else if (operation == BinaryOperatorKind::BO_Shr) {
+        if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
+            operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
+            operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_Shr);
+        }
+    }
+    else {
+        // Else we don't care for it.
+        return true;
+    }
+    m_serializeContents.push_back(std::move(operationInfo));
     return true;
 }
 

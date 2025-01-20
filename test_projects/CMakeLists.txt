@@ -29,7 +29,7 @@ include(GoogleTest)
 
 add_subdirectory(utils)
 
-add_executable(test_all test_all.cpp test_basic_project.cpp test_complex_project.cpp test_non_intrusive.cpp test_split.cpp)
+add_executable(test_all test_all.cpp test_basic_project.cpp test_complex_project.cpp test_non_intrusive.cpp test_split_ampersand.cpp test_split_directional.cpp)
 
 target_link_libraries(test_all basic test_utils gtest gtest_main ${Boost_LIBRARIES})
 target_include_directories(test_all SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/projects/basic ${CMAKE_SOURCE_DIR}/projects/complex ${CMAKE_SOURCE_DIR}/projects/non_intrusive ${CMAKE_SOURCE_DIR}/projects/split utils)
