@@ -38,7 +38,72 @@ struct SERIALIZABLE Split_AllMembersSerialized_Ampersand {
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
+// Serialization is ok, class does not use macro for discovery
+// Single regression test for the case without a macro
+struct SERIALIZABLE Split_AllMembersSerialized_Ampersand_NoMacro {
+    SERIALIZABLE int m_a = 1;
+    SERIALIZABLE float m_b = 1.;
+    SERIALIZABLE char m_c = 'c';
 
+    Split_AllMembersSerialized_Ampersand_NoMacro(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    Split_AllMembersSerialized_Ampersand_NoMacro() = default;
+
+    template<class Archive>
+    void save(Archive & ar, const unsigned int version) const
+    {
+        ar & m_a;
+        ar & m_b;
+        ar & m_c;
+    }
+    template<class Archive>
+    void load(Archive & ar, const unsigned int version)
+    {
+        ar & m_a;
+        ar & m_b;
+        ar & m_c;
+    }
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int file_version ){
+        boost::serialization::split_member(ar, *this, file_version);
+    }
+};
+
+// Order of elements in save/load are correct, but a marked member is not serialized
+// Single regression test for the case without a macro
+struct SERIALIZABLE Split_OneMemberNotSaved_Ampersand_NoMacro {
+    SERIALIZABLE int m_a = 1;
+    SERIALIZABLE float m_b = 1.;
+    SERIALIZABLE char m_c = 'c';
+
+    Split_OneMemberNotSaved_Ampersand_NoMacro(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    Split_OneMemberNotSaved_Ampersand_NoMacro() = default;
+
+    template<class Archive>
+    void save(Archive & ar, const unsigned int version) const
+    {
+        ar & m_a;
+        ar & m_b;
+        // ar & m_c;
+    }
+    template<class Archive>
+    void load(Archive & ar, const unsigned int version)
+    {
+        ar & m_a;
+        ar & m_b;
+        ar & m_c;
+    }
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int file_version ){
+        boost::serialization::split_member(ar, *this, file_version);
+    }
+};
+
+// Order of elements in save/load are correct, but a marked member is not serialized
+// Regression test
 struct SERIALIZABLE Split_OneMemberNotSaved_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
@@ -66,6 +131,8 @@ struct SERIALIZABLE Split_OneMemberNotSaved_Ampersand {
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
+// Order of elements in save/load are correct, but a marked member is not serialized
+// Regression test
 struct SERIALIZABLE Split_OneMemberNotLoaded_Ampersand {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;

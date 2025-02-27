@@ -37,7 +37,7 @@ TEST(Test_Split_NoError_Ampersand, ValueTest) {
     }
 }
 
-TEST(Test_Split_OneMemberNotSaved_Ampersand, ValueTest) {
+TEST(Split_AllMembersSerialized_Ampersand_NoMacro, ValueTest) {
     std::string filename;
     {
         filename = generateUniqueFilename();
@@ -46,7 +46,7 @@ TEST(Test_Split_OneMemberNotSaved_Ampersand, ValueTest) {
 
         boost::archive::text_oarchive ar(ifs);
 
-        Split_OneMemberNotSaved_Ampersand obj(14, 14, '1');
+        Split_AllMembersSerialized_Ampersand_NoMacro obj(14, 14, '1');
 
         EXPECT_NO_THROW(ar << obj);
     }
@@ -56,7 +56,36 @@ TEST(Test_Split_OneMemberNotSaved_Ampersand, ValueTest) {
 
         boost::archive::text_iarchive ar(fs);
 
-        Split_OneMemberNotSaved_Ampersand obj;
+        Split_AllMembersSerialized_Ampersand_NoMacro obj;
+
+        EXPECT_NO_THROW(ar >> obj);
+
+        EXPECT_EQ(obj.m_a, 14);
+        EXPECT_EQ(obj.m_b, 14.);
+        EXPECT_EQ(obj.m_c, '1');
+    }
+}
+
+TEST(Test_Split_OneMemberNotSaved_Ampersand_NoMacro, ValueTest) {
+    std::string filename;
+    {
+        filename = generateUniqueFilename();
+
+        std::ofstream ifs(filename);
+
+        boost::archive::text_oarchive ar(ifs);
+
+        Split_OneMemberNotSaved_Ampersand_NoMacro obj(14, 14, '1');
+
+        EXPECT_NO_THROW(ar << obj);
+    }
+    {
+
+        std::ifstream fs(filename);
+
+        boost::archive::text_iarchive ar(fs);
+
+        Split_OneMemberNotSaved_Ampersand_NoMacro obj;
 
         EXPECT_THROW(ar >> obj, boost::archive::archive_exception); // Will read past EOF.
     }

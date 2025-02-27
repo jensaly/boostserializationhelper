@@ -234,13 +234,13 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
 
     ASSERT_EQ(serializable_classes.size(), 7);
 
-    auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized__Directional");
-    auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved__Directional");
-    auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded__Directional");
-    auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved__Directional");
-    auto class_Split_MarkedMemberNotSavedOrLoaded = GetClassFromVector(serializable_classes, "Split_MarkedMemberNotSavedOrLoaded__Directional");
-    auto class_Split_WrongOrder_TypeOk = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeOk__Directional");
-    auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong__Directional");
+    auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional");
+    auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Directional");
+    auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded_Directional");
+    auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved_Directional");
+    auto class_Split_MarkedMemberNotSavedOrLoaded = GetClassFromVector(serializable_classes, "Split_MarkedMemberNotSavedOrLoaded_Directional");
+    auto class_Split_WrongOrder_TypeOk = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeOk_Directional");
+    auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong_Directional");
 
     ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
     ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
