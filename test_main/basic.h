@@ -175,9 +175,11 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 7);
+    ASSERT_EQ(serializable_classes.size(), 9);
 
     auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Ampersand");
+    auto class_Split_AllMembersSerialized_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Ampersand_NoMacro");
+    auto class_Split_OneMemberNotSaved_NoMacro = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Ampersand_NoMacro");
     auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Ampersand");
     auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded_Ampersand");
     auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved_Ampersand");
@@ -186,6 +188,8 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong_Ampersand");
 
     ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
+    ASSERT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
+    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
     ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
     ASSERT_FALSE(class_Split_OneMemberNotLoaded.expired());
     ASSERT_FALSE(class_Split_UnmarkedMemberSaved.expired());
@@ -194,6 +198,8 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     ASSERT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
 
     auto class_Split_AllMembersSerialized_Ptr = class_Split_AllMembersSerialized.lock();
+    auto class_Split_AllMembersSerialized_NoMacro_Ptr = class_Split_AllMembersSerialized_NoMacro.lock();
+    auto class_Split_OneMemberNotSaved_NoMacro_Ptr = class_Split_OneMemberNotSaved_NoMacro.lock();
     auto class_Split_OneMemberNotSaved_Ptr = class_Split_OneMemberNotSaved.lock();
     auto class_Split_OneMemberNotLoaded_Ptr = class_Split_OneMemberNotLoaded.lock();
     auto class_Split_UnmarkedMemberSaved_Ptr = class_Split_UnmarkedMemberSaved.lock();
@@ -202,6 +208,11 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     auto class_Split_WrongOrder_TypeWrong_Ptr = class_Split_WrongOrder_TypeWrong.lock();
 
     ASSERT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
 
     ASSERT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
     ASSERT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
@@ -232,9 +243,11 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 7);
+    ASSERT_EQ(serializable_classes.size(), 9);
 
     auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional");
+    auto class_Split_AllMembersSerialized_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional_NoMacro");
+    auto class_Split_OneMemberNotSaved_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional_NoMacro");
     auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Directional");
     auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded_Directional");
     auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved_Directional");
@@ -243,6 +256,8 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong_Directional");
 
     ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
+    ASSERT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
+    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
     ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
     ASSERT_FALSE(class_Split_OneMemberNotLoaded.expired());
     ASSERT_FALSE(class_Split_UnmarkedMemberSaved.expired());
@@ -251,6 +266,8 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     ASSERT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
 
     auto class_Split_AllMembersSerialized_Ptr = class_Split_AllMembersSerialized.lock();
+    auto class_Split_AllMembersSerialized_NoMacro_Ptr = class_Split_AllMembersSerialized_NoMacro.lock();
+    auto class_Split_OneMemberNotSaved_NoMacro_Ptr = class_Split_OneMemberNotSaved_NoMacro.lock();
     auto class_Split_OneMemberNotSaved_Ptr = class_Split_OneMemberNotSaved.lock();
     auto class_Split_OneMemberNotLoaded_Ptr = class_Split_OneMemberNotLoaded.lock();
     auto class_Split_UnmarkedMemberSaved_Ptr = class_Split_UnmarkedMemberSaved.lock();
@@ -259,6 +276,11 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     auto class_Split_WrongOrder_TypeWrong_Ptr = class_Split_WrongOrder_TypeWrong.lock();
 
     ASSERT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+
+    ASSERT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
 
     ASSERT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
     ASSERT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));

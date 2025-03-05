@@ -36,6 +36,8 @@ class SerializeFunctionInfo : public ISerializeFunctionInfo, public Serializatio
     
     std::vector<SerializeOperationInfoPtr> m_operationsInfo;
 
+    bool m_splitsInternally;
+
 public:
     SerializationErrorFlag GetErrors() const { return m_errorFlags; }
     std::vector<SerializeOperationInfoPtr> const& GetFields() const { return m_operationsInfo; };
@@ -49,8 +51,10 @@ public:
     void AddSerializableField(SerializeOperationInfoPtr&& operationInfo);
 
     void SetError(SerializationErrorFlag error);
-
     bool HasError(SerializationErrorFlag error) const;
+
+    void SetSplitsInternally(bool splitsInternally);
+    bool SplitsInternally() const;
 
     friend class SplitFunctionInfo_Intrusive;
 };

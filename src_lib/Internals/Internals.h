@@ -39,11 +39,14 @@ public:
 // Visitor for the Stmt of serialize functions
 class SerializableStmtVisitor : public clang::RecursiveASTVisitor<SerializableStmtVisitor> {
   std::vector<SerializeOperationInfoPtr> m_serializeContents;
+  bool m_split_internal{false};
   clang::ASTContext *Context;
 public:
   explicit SerializableStmtVisitor(clang::ASTContext* context);
   virtual bool VisitBinaryOperator(const clang::BinaryOperator *op);
+  bool VisitCallExpr(const  clang::CallExpr* call);
   const std::vector<SerializeOperationInfoPtr> GetOperations();
+  bool IsSplitInternal() const { return m_split_internal; }
 };
 
 class SaveStmtVisitor : public SerializableStmtVisitor{

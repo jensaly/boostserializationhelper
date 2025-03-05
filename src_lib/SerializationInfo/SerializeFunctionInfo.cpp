@@ -74,6 +74,14 @@ bool SerializeFunctionInfo::HasError(SerializationErrorFlag error) const {
     return true;
 }
 
+void SerializeFunctionInfo::SetSplitsInternally(bool splitsInternally) {
+    m_splitsInternally = splitsInternally;
+}
+
+bool SerializeFunctionInfo::SplitsInternally() const {
+    return m_splitsInternally;
+}
+
 SerializeFunctionInfo_Intrusive::SerializeFunctionInfo_Intrusive(std::string funcName, std::string filename, unsigned int line, unsigned int column)
         : SerializeFunctionInfo(funcName, filename, line, column)
 {

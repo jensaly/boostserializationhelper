@@ -142,18 +142,21 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 
     SerializeOperationInfoPtr operationInfo;
     if (operation == BO_And) {
+        // Operation uses &
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
             operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
             operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_And);
         }
     }
     else if (operation == BinaryOperatorKind::BO_Shl) {
+        // Operation is a save directional
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
             operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
             operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_Shl);
         }
     }
     else if (operation == BinaryOperatorKind::BO_Shr) {
+        // Operation is a load directional
         if (const auto rhs_decl = dyn_cast<MemberExpr>(rhs)) {
             operationInfo = InfoFactory::Create<SerializeOperationInfo>(*Context, rhs_decl);
             operationInfo->SetBinaryOperatorKind(BinaryOperatorKind::BO_Shr);
@@ -164,6 +167,22 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
         return true;
     }
     m_serializeContents.push_back(std::move(operationInfo));
+    return true;
+}
+
+bool SerializableStmtVisitor::VisitCallExpr(const CallExpr* call) {
+    const Expr *CalleeExpr = call->getCallee()->IgnoreImplicit()->IgnoreParenCasts();
+
+    if (const DeclRefExpr *DRE = dyn_cast<DeclRefExpr>(CalleeExpr)) {
+        if (const FunctionDecl *FD = dyn_cast<FunctionDecl>(DRE->getDecl())) {
+            if (FD->getQualifiedNameAsString() == "boost::serialization::split_member") {
+                m_split_internal = true;
+                return false;
+                // We end here under the assumption that the user does not put any further information in the serialize-function after calling this.
+                // TODO: We should probably intoduce a check to see that there is no more content, and raise a warning about bad behavior.
+            }
+        }
+    }
     return true;
 }
 

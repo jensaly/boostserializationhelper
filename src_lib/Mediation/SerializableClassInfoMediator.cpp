@@ -139,6 +139,7 @@ SerializeFunctionInfoPtr ParseSerializationFunctionBody(clang::ASTContext& conte
     for (auto& field : methodContents) {
         intrusiveSerializeMethodInfo->AddSerializableField(std::move(field));
     };
+    intrusiveSerializeMethodInfo->SetSplitsInternally(visitor.IsSplitInternal());
 
     return intrusiveSerializeMethodInfo;
 }
@@ -154,50 +155,26 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
 
     auto decls = serializableClass->decls();
 
-    if (IsSerializationSplit(context, serializableClass)) {
-        FunctionTemplateDecl* save;
-        FunctionTemplateDecl* load;
-        FindIntrusiveSplit(save, load, serializableClass);
-        // TODO: Right now, we can only be here if (and only if) a save and load exist intrusively. Need to handle non-intrusive splot by looking at the macros.
+    // First, search the declarations for an intrusive serialize method.
+    // If one is found, check it for the ::split_member declaration.
+    //  - If found, serialization is split and we must then seek for an intrusive split.
+    //  - If so, then find save/load, it is intrusively save/loaded and we handle accordingly.
+    //  - If not, it is non-intrusively split and we cease seeking.
+    // If the ::split_member is not found, we parse the serialize-method as normal.
+    // If no serialize is found, we assume for now that it is serialized non-intrusively
+    // Also must search for macro
 
-        SerializeFunctionInfoPtr save_info = ParseSerializationFunctionBody(context, save);
-        SerializeFunctionInfoPtr load_info = ParseSerializationFunctionBody(context, load);
+    // Therefore, we begin with a search for the serialize-method:
 
-        std::string saveFilename, loadFileName;
-        unsigned int saveLine, loadLine, saveColumn, loadColumn;
-        Utils::GetFullLocaionOfDecl(context, save, saveFilename, saveLine, saveColumn);
-        {
-            auto body = save->getBody();
+    // fun SeekSerialize
+    // If not found, assume not intrusively and return
+    // Check if contains the ::split_member.
+    // If not, parse as normal !IsSerializationSplit
+    // Else, seek save load functions.
+    // If found, parse as normal.
+    // If not found, assume non-intrusively split and move on.
 
-            SerializableStmtVisitor visitor{&context};
-            visitor.TraverseStmt(body);
-            auto methodContents = visitor.GetOperations();
-
-            for (auto& field : methodContents) {
-                save_info->AddSerializableField(std::move(field));
-            };
-        }
-        
-        Utils::GetFullLocaionOfDecl(context, load, loadFileName, loadLine, loadColumn);
-        {
-            auto body = load->getBody();
-
-            SerializableStmtVisitor visitor{&context};
-            visitor.TraverseStmt(body);
-            auto methodContents = visitor.GetOperations();
-
-            for (auto& field : methodContents) {
-                load_info->AddSerializableField(std::move(field));
-            };
-        }
-
-        auto splitSerializeMethodInfo = std::make_shared<SplitFunctionInfo_Intrusive>(std::move(save_info), std::move(load_info));
-
-        classInfo->SetSerializeMethodInfo(splitSerializeMethodInfo);
-
-        return true;
-    }
-    else {
+    if (!IsSerializationSplit(context, serializableClass)) {
         // Search the decl to see if the method is found internally.
         auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
             if (auto templateMethod = dyn_cast<FunctionTemplateDecl>(decl)) {
@@ -215,10 +192,62 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
 
         auto serializeDecl = dyn_cast<FunctionTemplateDecl>(*serialize_it);
 
-        classInfo->SetSerializeMethodInfo(ParseSerializationFunctionBody(context, serializeDecl));
-        
-        return true;
+        auto methodInfo = ParseSerializationFunctionBody(context, serializeDecl);
+
+        // Check if the processing of the serialize-method discovered the call to split_member.
+        // If so, do not set the serialize-method as it is assumed empty.
+        if (!methodInfo->SplitsInternally()) {
+            classInfo->SetSerializeMethodInfo(methodInfo);
+            return true;
+        }
     }
+
+    if (!IsSerializationSplit(context, serializableClass)) {
+        return false;
+    }
+
+    // Missed return for non-split. So it must be split, or not exist.
+    FunctionTemplateDecl* save;
+    FunctionTemplateDecl* load;
+    FindIntrusiveSplit(save, load, serializableClass);
+    // TODO: Right now, we can only be here if (and only if) a save and load exist intrusively. Need to handle non-intrusive split by looking at the macros.
+
+    SerializeFunctionInfoPtr save_info = ParseSerializationFunctionBody(context, save);
+    SerializeFunctionInfoPtr load_info = ParseSerializationFunctionBody(context, load);
+
+    std::string saveFilename, loadFileName;
+    unsigned int saveLine, loadLine, saveColumn, loadColumn;
+    Utils::GetFullLocaionOfDecl(context, save, saveFilename, saveLine, saveColumn);
+    {
+        auto body = save->getBody();
+
+        SerializableStmtVisitor visitor{&context};
+        visitor.TraverseStmt(body);
+        auto methodContents = visitor.GetOperations();
+
+        for (auto& field : methodContents) {
+            save_info->AddSerializableField(std::move(field));
+        };
+    }
+    
+    Utils::GetFullLocaionOfDecl(context, load, loadFileName, loadLine, loadColumn);
+    {
+        auto body = load->getBody();
+
+        SerializableStmtVisitor visitor{&context};
+        visitor.TraverseStmt(body);
+        auto methodContents = visitor.GetOperations();
+
+        for (auto& field : methodContents) {
+            load_info->AddSerializableField(std::move(field));
+        };
+    }
+
+    auto splitSerializeMethodInfo = std::make_shared<SplitFunctionInfo_Intrusive>(std::move(save_info), std::move(load_info));
+
+    classInfo->SetSerializeMethodInfo(splitSerializeMethodInfo);
+
+    return true;
 }
 
 // TODO: The save/load methods are declared by BOOST_SERIALIZATION_SPLIT_MEMBER macro.
