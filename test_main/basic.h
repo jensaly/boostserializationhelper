@@ -247,7 +247,7 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
 
     auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional");
     auto class_Split_AllMembersSerialized_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional_NoMacro");
-    auto class_Split_OneMemberNotSaved_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional_NoMacro");
+    auto class_Split_OneMemberNotSaved_NoMacro = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Directional_NoMacro");
     auto class_Split_OneMemberNotSaved = GetClassFromVector(serializable_classes, "Split_OneMemberNotSaved_Directional");
     auto class_Split_OneMemberNotLoaded = GetClassFromVector(serializable_classes, "Split_OneMemberNotLoaded_Directional");
     auto class_Split_UnmarkedMemberSaved = GetClassFromVector(serializable_classes, "Split_UnmarkedMemberSaved_Directional");

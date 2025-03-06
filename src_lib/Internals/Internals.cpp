@@ -116,6 +116,14 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
     SerializationContext::Log();
 }
 
+void FindSerializableClassAction::ExecuteAction() {
+    clang::Preprocessor &PP = getCompilerInstance().getPreprocessor();
+    PP.addPPCallbacks(std::make_unique<SplitMemberMacro>(PP));
+
+    // Run the normal AST actions
+    ASTFrontendAction::ExecuteAction();
+}
+
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     auto ptr = std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
 
@@ -170,19 +178,15 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
     return true;
 }
 
-bool SerializableStmtVisitor::VisitCallExpr(const CallExpr* call) {
-    const Expr *CalleeExpr = call->getCallee()->IgnoreImplicit()->IgnoreParenCasts();
-
-    if (const DeclRefExpr *DRE = dyn_cast<DeclRefExpr>(CalleeExpr)) {
-        if (const FunctionDecl *FD = dyn_cast<FunctionDecl>(DRE->getDecl())) {
-            if (FD->getQualifiedNameAsString() == "boost::serialization::split_member") {
-                m_split_internal = true;
-                return false;
-                // We end here under the assumption that the user does not put any further information in the serialize-function after calling this.
-                // TODO: We should probably intoduce a check to see that there is no more content, and raise a warning about bad behavior.
-            }
+bool SerializableStmtVisitor::VisitCallExpr(const CallExpr* Call) {
+    if (const UnresolvedLookupExpr *ULE = dyn_cast<UnresolvedLookupExpr>(Call->getCallee()->IgnoreImplicit())) {
+        if (ULE->getName().getAsString() == "split_member") {
+            // llvm::outs() << "Found boost::serialization::split_member inside function!\n";
+            m_split_internal = true;
+            return true;
         }
     }
+    m_split_internal = false;
     return true;
 }
 
@@ -208,3 +212,31 @@ bool SaveStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
     return true;
 }
 
+void SplitMemberMacro::MacroExpands(const clang::Token &MacroNameTok, const clang::MacroDefinition &MD,
+                clang::SourceRange Range, const clang::MacroArgs *Args) {
+    std::string MacroName = MacroNameTok.getIdentifierInfo()->getName().str();
+    
+    if (MacroName == "BOOST_SERIALIZATION_SPLIT_MEMBER") {
+        clang::SourceLocation ExpansionLoc = Range.getBegin();
+        //llvm::errs() << "Detected macro expansion: " << MacroName << " at " << ExpansionLoc.printToString(PP.getSourceManager()) << "\n";
+
+        // Store the expansion location for later class lookup
+        m_splitMacroLocations.push_back(ExpansionLoc);
+    }
+}
+
+bool SplitMemberMacro::ClassContainsSplitMacro(clang::ASTContext& context, const clang::CXXRecordDecl* classDecl) {
+    clang::SourceLocation classStart = classDecl->getBeginLoc();
+    clang::SourceLocation classEnd = classDecl->getEndLoc();
+    auto& sm = context.getSourceManager();
+    
+    for (const auto &MacroLoc : m_splitMacroLocations) {
+        if (sm.isPointWithin(MacroLoc, classStart, classEnd)) {
+            //llvm::errs() << "Macro found inside class: " << classDecl->getNameAsString() << "\n";
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<clang::SourceLocation> SplitMemberMacro::m_splitMacroLocations{};

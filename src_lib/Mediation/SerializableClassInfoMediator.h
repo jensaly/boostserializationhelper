@@ -63,5 +63,4 @@ private:
 public:
     static bool FetchSerializeMethod(clang::ASTContext& context, const clang::CXXRecordDecl* serializableClass, SerializableClassInfoPtr classInfo);
     static void FetchSerializableMembers(clang::ASTContext& context, const clang::CXXRecordDecl* serializableClass, SerializableClassInfoPtr classInfo);
-    static bool IsSerializationSplit(clang::ASTContext& context, const clang::CXXRecordDecl* serializable);
 };

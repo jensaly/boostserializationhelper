@@ -33,7 +33,8 @@ private:
 
 class FindSerializableClassAction : public clang::ASTFrontendAction {
 public:
-  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
+  void ExecuteAction() override;
+  std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) override;
 };
 
 // Visitor for the Stmt of serialize functions
@@ -65,4 +66,22 @@ public:
   explicit LoadStmtVisitor(clang::ASTContext* context);
   bool VisitBinaryOperator(const clang::BinaryOperator *op) override;
   const std::vector<SerializeOperationInfoPtr> GetOperations();
+};
+
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/PPCallbacks.h"
+#include "clang/Frontend/CompilerInstance.h"
+
+class SplitMemberMacro : public clang::PPCallbacks {
+public:
+  explicit SplitMemberMacro(clang::Preprocessor &PP) : PP(PP) {}
+
+  void MacroExpands(const clang::Token &MacroNameTok, const clang::MacroDefinition &MD,
+                    clang::SourceRange Range, const clang::MacroArgs *Args) override;
+
+  static bool ClassContainsSplitMacro(clang::ASTContext& context, const clang::CXXRecordDecl* classDecl);
+
+private:
+    clang::Preprocessor &PP;
+    static std::vector<clang::SourceLocation> m_splitMacroLocations;
 };
