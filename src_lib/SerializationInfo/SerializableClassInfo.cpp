@@ -62,6 +62,10 @@ bool SerializableClassInfo::HasError(SerializationErrorFlag error) const {
     }
 }
 
+size_t SerializableClassInfo::NumberOfErrors() const {
+    return m_errors.size();
+}
+
 bool SerializableClassInfo::HasSerializeMethod() const {
     return m_methodInfo != nullptr;
 }

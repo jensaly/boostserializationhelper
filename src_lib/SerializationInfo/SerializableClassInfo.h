@@ -51,6 +51,8 @@ public:
 
     bool HasError(SerializationErrorFlag error) const;
 
+    size_t NumberOfErrors() const;
+
     bool HasSerializeMethod() const;
 
     void RunSerializeMethodAnalysis();

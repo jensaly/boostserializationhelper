@@ -162,14 +162,14 @@ struct SERIALIZABLE Split_OneMemberNotLoaded_Directional {
 
 // Order of elements in save/load are correct, but an unmarked member is serialized
 // Regression test
-struct SERIALIZABLE Split_UnmarkedMemberSaved_Directional {
+struct SERIALIZABLE Split_UnmarkedMemberSavedAndLoaded_Directional {
     SERIALIZABLE int m_a = 1;
     SERIALIZABLE float m_b = 1.;
     char m_c = 'c';
 
-    Split_UnmarkedMemberSaved_Directional(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+    Split_UnmarkedMemberSavedAndLoaded_Directional(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
 
-    Split_UnmarkedMemberSaved_Directional() = default;
+    Split_UnmarkedMemberSavedAndLoaded_Directional() = default;
 
     template<class Archive>
     void save(Archive & ar, const unsigned int version) const

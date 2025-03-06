@@ -121,7 +121,7 @@ TEST(Test_Split_OneMemberNotLoaded_Ampersand, ValueTest) {
     }
 }
 
-TEST(Test_Split_UnmarkedMemberSaved_Ampersand, ValueTest) {
+TEST(Test_Split_UnmarkedMemberSavedAndLoaded_Ampersand, ValueTest) {
     std::string filename;
     {
         filename = generateUniqueFilename();
@@ -130,7 +130,7 @@ TEST(Test_Split_UnmarkedMemberSaved_Ampersand, ValueTest) {
 
         boost::archive::text_oarchive ar(ifs);
 
-        Split_UnmarkedMemberSaved_Ampersand obj(14, 14, '1');
+        Split_UnmarkedMemberSavedAndLoaded_Ampersand obj(14, 14, '1');
 
         EXPECT_NO_THROW(ar << obj);
     }
@@ -140,7 +140,7 @@ TEST(Test_Split_UnmarkedMemberSaved_Ampersand, ValueTest) {
 
         boost::archive::text_iarchive ar(fs);
 
-        Split_UnmarkedMemberSaved_Ampersand obj;
+        Split_UnmarkedMemberSavedAndLoaded_Ampersand obj;
 
         EXPECT_NO_THROW(ar >> obj);
 

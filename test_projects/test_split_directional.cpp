@@ -92,7 +92,7 @@ TEST(Test_Split_OneMemberNotLoaded_Directional, ValueTest) {
     }
 }
 
-TEST(Test_Split_UnmarkedMemberSaved_Directional, ValueTest) {
+TEST(Test_Split_UnmarkedMemberSavedAndLoaded_Directional, ValueTest) {
     std::string filename;
     {
         filename = generateUniqueFilename();
@@ -101,7 +101,7 @@ TEST(Test_Split_UnmarkedMemberSaved_Directional, ValueTest) {
 
         boost::archive::text_oarchive ar(ifs);
 
-        Split_UnmarkedMemberSaved_Directional obj(14, 14, '1');
+        Split_UnmarkedMemberSavedAndLoaded_Directional obj(14, 14, '1');
 
         EXPECT_NO_THROW(ar << obj);
     }
@@ -111,7 +111,7 @@ TEST(Test_Split_UnmarkedMemberSaved_Directional, ValueTest) {
 
         boost::archive::text_iarchive ar(fs);
 
-        Split_UnmarkedMemberSaved_Directional obj;
+        Split_UnmarkedMemberSavedAndLoaded_Directional obj;
 
         EXPECT_NO_THROW(ar >> obj);
 
