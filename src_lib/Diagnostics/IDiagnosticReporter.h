@@ -3,12 +3,12 @@
 // ==================================
 // Standard Library Headers
 // ==================================
-#include <string>
 
 // ==================================
 // Internal Headers
 // ==================================
-#include <SerializationInfo/SerializationObject.h>
+#include <vector>
+#include <string>
 
 // ==================================
 // Libtooling Headers
@@ -17,11 +17,11 @@
 // ==================================
 // Forward Declarations
 // ==================================
-class SerializeOperationInfo;
 
-class SerializableFieldInfo : public SerializationObject {
+class DiagnosticMessage;
+
+class IDiagnosticReporter {
 public:
-    SerializableFieldInfo(std::string name, std::string filename, unsigned int line, unsigned int column);
-
-    bool operator==(const SerializeOperationInfo& field);
+    virtual ~IDiagnosticReporter() = default;
+    virtual void forward(std::vector<std::string> const& messages) = 0;
 };

@@ -1,11 +1,13 @@
 // ==================================
 // Standard Library Headers
 // ==================================
+#include <iostream>
 
 // ==================================
 // Internal Headers
 // ==================================
 #include "SerializationContext.h"
+#include <Diagnostics/IDiagnosticReporter.h>
 #include <Mediation/SerializableClassInfoMediator.h>
 #include <SerializationInfo/SerializableClassInfo.h>
 
@@ -17,7 +19,17 @@
 // Forward Declarations
 // ==================================
 
-/// @brief 
+
+std::unique_ptr<IDiagnosticReporter> SerializationContext::m_reporter = nullptr;
+
+void SerializationContext::SetDiagnosticsReporter(std::unique_ptr<IDiagnosticReporter> reporter) {
+    m_reporter = std::move(reporter);
+}
+
+void SerializationContext::Reset() {
+    m_reporter.reset();
+}
+
 void SerializationContext::Mediate() {
     ResolveNonIntrusiveSerializeMethods();
 }
@@ -46,4 +58,13 @@ void SerializationContext::Analyze() {
     for (auto& [decl, info] : serializableClasses) {
         info->RunSerializeMethodAnalysis();
     }
+}
+
+void SerializationContext::Log() {
+    auto& serializableClasses = SerializableClassInfoMediator::serializables;
+    std::vector<std::string> output;
+    for (auto& [decl, info] : serializableClasses) {
+        info->Log(output);
+    }
+    m_reporter->forward(output);
 }

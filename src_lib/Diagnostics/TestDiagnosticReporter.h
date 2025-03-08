@@ -3,12 +3,12 @@
 // ==================================
 // Standard Library Headers
 // ==================================
-#include <string>
+#include <fstream>
 
 // ==================================
 // Internal Headers
 // ==================================
-#include <SerializationInfo/SerializationObject.h>
+#include <Diagnostics/IDiagnosticReporter.h>
 
 // ==================================
 // Libtooling Headers
@@ -17,11 +17,14 @@
 // ==================================
 // Forward Declarations
 // ==================================
-class SerializeOperationInfo;
 
-class SerializableFieldInfo : public SerializationObject {
+class TestDiagnosticReporter : public IDiagnosticReporter {
+    std::ofstream file;
+
 public:
-    SerializableFieldInfo(std::string name, std::string filename, unsigned int line, unsigned int column);
+    explicit TestDiagnosticReporter(std::string filename);
 
-    bool operator==(const SerializeOperationInfo& field);
+    ~TestDiagnosticReporter();
+
+    void forward(std::vector<std::string> const& messages) override;
 };

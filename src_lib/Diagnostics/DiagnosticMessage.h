@@ -8,7 +8,6 @@
 // ==================================
 // Internal Headers
 // ==================================
-#include <SerializationInfo/SerializationObject.h>
 
 // ==================================
 // Libtooling Headers
@@ -17,11 +16,10 @@
 // ==================================
 // Forward Declarations
 // ==================================
-class SerializeOperationInfo;
 
-class SerializableFieldInfo : public SerializationObject {
+enum class Severity { Info, Warning, Error };
+
+class DiagnosticMessage {
 public:
-    SerializableFieldInfo(std::string name, std::string filename, unsigned int line, unsigned int column);
-
-    bool operator==(const SerializeOperationInfo& field);
+    std::string serializationErrorToString()
 };

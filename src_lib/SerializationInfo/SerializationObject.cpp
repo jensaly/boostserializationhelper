@@ -1,5 +1,3 @@
-#pragma once
-
 // ==================================
 // Standard Library Headers
 // ==================================
@@ -17,11 +15,9 @@
 // ==================================
 // Forward Declarations
 // ==================================
-class SerializeOperationInfo;
 
-class SerializableFieldInfo : public SerializationObject {
-public:
-    SerializableFieldInfo(std::string name, std::string filename, unsigned int line, unsigned int column);
+SerializationObject::SerializationObject(std::string declName, std::string filename, unsigned int line, unsigned int column)
+        : m_name{declName}, m_filename{filename}, m_line{line}, m_column{column} 
+{
 
-    bool operator==(const SerializeOperationInfo& field);
-};
+}

@@ -87,6 +87,14 @@
         "ios": "cpp",
         "locale": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "charconv": "cpp",
+        "complex": "cpp",
+        "source_location": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "typeindex": "cpp",
+        "format": "cpp",
+        "*.def": "cpp"
     }
 }

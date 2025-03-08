@@ -8,6 +8,7 @@
 #include <SerializationInfo/SerializableClassInfo.h>
 #include <SerializationInfo/SerializableFieldInfo.h>
 #include <SerializationInfo/SerializeOperationInfo.h>
+#include <Types/InfoTypes.h>
 
 // ==================================
 // Libtooling Headers
@@ -17,11 +18,11 @@
 // Forward Declarations
 // ==================================
 
-std::vector<SerializableFieldInfo> const& SerializableClassInfo::GetFields() const {
+std::vector<std::shared_ptr<SerializableFieldInfo>> const& SerializableClassInfo::GetFields() const {
     return m_fields;
 }
 
-bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<SerializeFunctionInfo> serializeFunctionInfo) {
+bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<ISerializeFunctionInfo> serializeFunctionInfo) {
     if (m_methodInfo != nullptr) {
         return false;
     }
@@ -29,29 +30,53 @@ bool SerializableClassInfo::SetSerializeMethodInfo(std::shared_ptr<SerializeFunc
     return true;
 }
 
-SerializableClassInfo::SerializableClassInfo(std::string className) : m_className{className} {
+SerializableClassInfo::SerializableClassInfo(std::string className, std::string filename, unsigned int line, unsigned int column)
+        : SerializationObject(className, filename, line, column)
+{
 
 }
 
 SerializableClassName SerializableClassInfo::GetClassName() const {
-    return m_className;
+    return GetName();
 }
 
-void SerializableClassInfo::AddSerializableField(SerializableFieldInfo fieldInfo) {
-    m_fields.push_back(fieldInfo);
+void SerializableClassInfo::AddSerializableField(std::shared_ptr<SerializableFieldInfo>&& fieldInfo) {
+    m_fields.push_back(std::move(fieldInfo));
 }
 
-void SerializableClassInfo::SetError(SerializationError error) {
-    m_errors |= error;
+void SerializableClassInfo::SetError(SerializationErrorFlag error) {
+    m_errorFlags |= error;
 }
 
-bool SerializableClassInfo::HasError(SerializationError error) const {
-    if (error != SerializationError::Error_NoError) {
-        return (m_errors & error) != SerializationError::Error_NoError;
+void SerializableClassInfo::SetError(std::unique_ptr<SerializationError>&& error) {
+    SetError(error->m_flag);
+    m_errors.push_back(std::move(error));
+}
+
+bool SerializableClassInfo::HasError(SerializationErrorFlag error) const {
+    if (error != SerializationErrorFlag::Error_NoError) {
+        return (m_errorFlags & error) != SerializationErrorFlag::Error_NoError;
     }
     else {
-        return m_errors == error;
+        return m_errorFlags == error;
     }
+}
+
+void SerializableClassInfo::SetInfo(SerializationInfoFlag info) {
+    //m_infoFlags |= info;
+}
+
+void SerializableClassInfo::SetInfo(std::unique_ptr<SerializationInfoFlag>&& info) {
+    //SetError(info->m_flag);
+    //m_info.push_back(std::move(info));
+}
+
+bool SerializableClassInfo::HasInfo(SerializationInfoFlag error) const {
+    return false;
+}
+
+size_t SerializableClassInfo::NumberOfErrors() const {
+    return m_errors.size();
 }
 
 bool SerializableClassInfo::HasSerializeMethod() const {
@@ -59,29 +84,19 @@ bool SerializableClassInfo::HasSerializeMethod() const {
 }
 
 void SerializableClassInfo::RunSerializeMethodAnalysis() {
-    SerializationError error = SerializationError::Error_NoError;
+    SerializationErrorFlag error = SerializationErrorFlag::Error_NoError;
 
     if (m_methodInfo == nullptr) {
-        SetError(SerializationError::Error_SerializeMethodNotFound);
+        auto error = std::make_unique<SerializationError_SerializeMethodNotFound>(shared_from_this());
+        SetError(std::move(error));
         return;
     }
 
-    auto methodContents = m_methodInfo->GetFields();
-    auto classFields = GetFields();
+    m_methodInfo->RunChecks(shared_from_this());
+}
 
-    for (auto& field : classFields) {
-        if (std::find_if(methodContents.begin(), methodContents.end(), [&](SerializeOperationInfo& operationInfo){ 
-            return field == operationInfo;
-        }) == methodContents.end()) {
-            SetError(SerializationError::Error_MarkedFieldNotSerialized);
-        }
-    }
-
-    for (auto& field : methodContents) {
-        if (std::find_if(classFields.begin(), classFields.end(), [&](SerializableFieldInfo& operationInfo){ 
-            return field == operationInfo;
-        }) == classFields.end()) {
-            SetError(SerializationError::Error_UnmarkedFieldSerialized);
-        }
+void SerializableClassInfo::Log(std::vector<std::string>& output) {
+    for (auto& error : m_errors) {
+        error->ToString(output);
     }
 }
