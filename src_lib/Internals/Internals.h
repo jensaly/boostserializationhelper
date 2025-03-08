@@ -74,7 +74,7 @@ public:
 
 class SplitMemberMacro : public clang::PPCallbacks {
 public:
-  explicit SplitMemberMacro(clang::Preprocessor &PP) : PP(PP) {}
+  explicit SplitMemberMacro() {}
 
   void MacroExpands(const clang::Token &MacroNameTok, const clang::MacroDefinition &MD,
                     clang::SourceRange Range, const clang::MacroArgs *Args) override;
@@ -82,6 +82,5 @@ public:
   static bool ClassContainsSplitMacro(clang::ASTContext& context, const clang::CXXRecordDecl* classDecl);
 
 private:
-    clang::Preprocessor &PP;
     static std::vector<clang::SourceLocation> m_splitMacroLocations;
 };

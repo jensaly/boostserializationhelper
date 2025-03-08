@@ -29,7 +29,6 @@ SerializeFunctionInfo::~SerializeFunctionInfo() {
 }
 
 void SerializeFunctionInfo::RunChecks(SerializableClassInfoPtr classInfo) {
-    SerializationErrorFlag flag;
     auto methodContents = GetFields();
     auto classFields = classInfo->GetFields();
 
@@ -38,7 +37,7 @@ void SerializeFunctionInfo::RunChecks(SerializableClassInfoPtr classInfo) {
             return field->GetName() == operationInfo->GetName();
         });
         if (operation_it == methodContents.end()) {
-            auto& operation = *operation_it;
+            //auto& operation = *operation_it;
             // No serialize operations could be matched to the content of the class definition
             std::unique_ptr<SerializationError> error = std::make_unique<SerializationError_MarkedFieldNotSerialized>(
                 *field, *this, classInfo
@@ -113,7 +112,7 @@ void SplitFunctionInfo_Intrusive::RunChecks(SerializableClassInfoPtr classInfo) 
 
     // Basic order check
     // If the number of serialize operations is uneven, we nonetheless look at those which are already present. An error is raised if an issue exists within this
-    for (int i = 0; i < loadFields.size() && i < saveFields.size(); i++) {
+    for (size_t i = 0; i < loadFields.size() && i < saveFields.size(); i++) {
         auto lf = loadFields[i];
         auto sf = saveFields[i];
 

@@ -109,6 +109,9 @@ SerializationError_SaveLoadOrderMismatched::SerializationError_SaveLoadOrderMism
     SerializeOperationInfo& loadOperation, SerializeOperationInfo& saveOperation, SerializeFunctionInfo& saveFunction, SerializeFunctionInfo& loadFunction, SerializableClassInfoPtr owningClass) 
         : SerializationError(SerializationErrorFlag::Error_SaveLoadOrderMismatched, owningClass)
 {
+    (void)saveFunction;
+    (void)loadFunction;
+    (void)owningClass;
     m_fieldName = loadOperation.GetName();
     m_filenameLoad = loadOperation.GetFilename();
     m_loadLine = loadOperation.GetLine();

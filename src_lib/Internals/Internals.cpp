@@ -45,7 +45,6 @@ bool FindSerializableClassVisitor::VisitCXXRecordDecl(CXXRecordDecl *Declaration
 
     // Two separate paths for whether the class is split-serialized or not.
 
-    FunctionTemplateDecl* serializeMethodTemplate = nullptr;
     if (!DiscoveryHelper::FetchSerializeMethod(*Context, Declaration, thisClassInfo)) {
         // No intrusive serialize method exists. One may be set during mediation.
     }
@@ -118,7 +117,7 @@ void FindSerializableClassConsumer::HandleTranslationUnit(clang::ASTContext &Con
 
 void FindSerializableClassAction::ExecuteAction() {
     clang::Preprocessor &PP = getCompilerInstance().getPreprocessor();
-    PP.addPPCallbacks(std::make_unique<SplitMemberMacro>(PP));
+    PP.addPPCallbacks(std::make_unique<SplitMemberMacro>());
 
     // Run the normal AST actions
     ASTFrontendAction::ExecuteAction();
@@ -126,7 +125,7 @@ void FindSerializableClassAction::ExecuteAction() {
 
 std::unique_ptr<clang::ASTConsumer> FindSerializableClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
     auto ptr = std::make_unique<FindSerializableClassConsumer>(&Compiler.getASTContext());
-
+    (void)InFile;
     return std::move(ptr);
 }
 
@@ -181,7 +180,7 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 bool SerializableStmtVisitor::VisitCallExpr(const CallExpr* Call) {
     constexpr std::string_view boostSplitMacroName = "split_member";
     if (const UnresolvedLookupExpr *ULE = dyn_cast<UnresolvedLookupExpr>(Call->getCallee()->IgnoreImplicit())) {
-        if (ULE->getName().getAsString() == "split_member") {
+        if (ULE->getName().getAsString() == boostSplitMacroName) {
             // llvm::outs() << "Found boost::serialization::split_member inside function!\n";
             m_split_internal = true;
             return true;
@@ -202,6 +201,10 @@ SaveStmtVisitor::SaveStmtVisitor(clang::ASTContext* context)
 }
 
 bool SaveStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
+    // TODO: This is seriously lackluster. It will succeed for any binary operation in the serialize function.
+    if (op == nullptr) {
+        return true;
+    }
     if (op->getOpcode() == BO_And) {
         const Expr* lhs = op->getLHS();
         const Expr* rhs = op->getRHS();
@@ -215,6 +218,8 @@ bool SaveStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 
 void SplitMemberMacro::MacroExpands(const clang::Token &MacroNameTok, const clang::MacroDefinition &MD,
                 clang::SourceRange Range, const clang::MacroArgs *Args) {
+    (void)MD;
+    (void)Args;
     constexpr std::string_view boostSplitMacroName = "BOOST_SERIALIZATION_SPLIT_MEMBER";
     std::string MacroName = MacroNameTok.getIdentifierInfo()->getName().str();
     

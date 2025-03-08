@@ -187,8 +187,6 @@ ISerializeFunctionInfoPtr ParseSplitSerializationFunctionBodies(clang::ASTContex
 bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXXRecordDecl* serializableClass, SerializableClassInfoPtr classInfo) {
     // Serialize methods are always template functions
 
-    auto decls = serializableClass->decls();
-
     // First, search the declarations for an intrusive serialize method.
     // If one is found, check it for the ::split_member declaration.
     //  - If found, serialization is split and we must then seek for an intrusive split.
