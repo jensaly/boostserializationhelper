@@ -54,11 +54,11 @@ TEST_F(SH_Tests, BasicAnalysis) {
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
 
-    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+    EXPECT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 6);
+    EXPECT_EQ(serializable_classes.size(), 6);
 
     auto class_Basic_NotSerialized = GetClassFromVector(serializable_classes, "Basic_NotSerialized");
     auto class_Basic_SerializableWithoutFunction = GetClassFromVector(serializable_classes, "Basic_SerializableWithoutFunction");
@@ -68,13 +68,13 @@ TEST_F(SH_Tests, BasicAnalysis) {
     auto class_Basic_UntaggedMemberSeralized = GetClassFromVector(serializable_classes, "Basic_UntaggedMemberSeralized");
     auto class_Basic_TwoErrorsAtOnce = GetClassFromVector(serializable_classes, "Basic_TwoErrorsAtOnce");
 
-    ASSERT_TRUE(class_Basic_NotSerialized.expired());
-    ASSERT_FALSE(class_Basic_SerializableWithoutFunction.expired());
-    ASSERT_FALSE(class_Basic_AllMembersSerialized.expired());
-    ASSERT_FALSE(class_Basic_OneMemberNotSerialized.expired());
-    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized.expired());
-    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized.expired());
-    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce.expired());
+    EXPECT_TRUE(class_Basic_NotSerialized.expired());
+    EXPECT_FALSE(class_Basic_SerializableWithoutFunction.expired());
+    EXPECT_FALSE(class_Basic_AllMembersSerialized.expired());
+    EXPECT_FALSE(class_Basic_OneMemberNotSerialized.expired());
+    EXPECT_FALSE(class_Basic_TaggedMemberNotSerialized.expired());
+    EXPECT_FALSE(class_Basic_UntaggedMemberSeralized.expired());
+    EXPECT_FALSE(class_Basic_TwoErrorsAtOnce.expired());
     auto class_Basic_SerializableWithoutFunction_Ptr = class_Basic_SerializableWithoutFunction.lock();
     auto class_Basic_AllMembersSerialized_Ptr = class_Basic_AllMembersSerialized.lock();
     auto class_Basic_OneMemberNotSerialized_Ptr = class_Basic_OneMemberNotSerialized.lock();
@@ -83,35 +83,53 @@ TEST_F(SH_Tests, BasicAnalysis) {
     auto class_Basic_TwoErrorsAtOnce_Ptr = class_Basic_TwoErrorsAtOnce.lock();
     
     // Testing errors in detail to ensure it's not false positive
-    ASSERT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Basic_SerializableWithoutFunction_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Basic_SerializableWithoutFunction_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_SerializableWithoutFunction_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_EQ(class_Basic_AllMembersSerialized_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Basic_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_EQ(class_Basic_OneMemberNotSerialized_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Basic_OneMemberNotSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_OneMemberNotSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_EQ(class_Basic_TaggedMemberNotSerialized_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Basic_TaggedMemberNotSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_TaggedMemberNotSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Basic_UntaggedMemberSeralized_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Basic_UntaggedMemberSeralized_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_UntaggedMemberSeralized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_EQ(class_Basic_TwoErrorsAtOnce_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Basic_TwoErrorsAtOnce_Ptr->HasInfo(SerializationInfoFlag::Info_NoInfo));
+    EXPECT_FALSE(class_Basic_TwoErrorsAtOnce_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 }
 
 TEST_F(SH_Tests, NonIntrusiveAnalysis) {
@@ -120,11 +138,11 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
 
-    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+    EXPECT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 5);
+    EXPECT_EQ(serializable_classes.size(), 5);
 
     auto class_NonIntrusive_NoError = GetClassFromVector(serializable_classes, "NonIntrusive_NoError");
     auto class_NonIntrusive_TaggedMemberNotSerialized = GetClassFromVector(serializable_classes, "NonIntrusive_TaggedMemberNotSerialized");
@@ -132,11 +150,11 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
     auto class_NonIntrusive_SerializableWithoutFunction = GetClassFromVector(serializable_classes, "NonIntrusive_SerializableWithoutFunction");
     auto class_NonIntrusive_TwoErrorsAtOnce = GetClassFromVector(serializable_classes, "NonIntrusive_TwoErrorsAtOnce");
 
-    ASSERT_FALSE(class_NonIntrusive_NoError.expired());
-    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized.expired());
-    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized.expired());
-    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction.expired());
-    ASSERT_FALSE(class_NonIntrusive_TwoErrorsAtOnce.expired());
+    EXPECT_FALSE(class_NonIntrusive_NoError.expired());
+    EXPECT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized.expired());
+    EXPECT_FALSE(class_NonIntrusive_UntaggedMemberSeralized.expired());
+    EXPECT_FALSE(class_NonIntrusive_SerializableWithoutFunction.expired());
+    EXPECT_FALSE(class_NonIntrusive_TwoErrorsAtOnce.expired());
 
     auto class_NonIntrusive_NoError_Ptr = class_NonIntrusive_NoError.lock();
     auto class_NonIntrusive_TaggedMemberNotSerialized_Ptr = class_NonIntrusive_TaggedMemberNotSerialized.lock();
@@ -144,25 +162,35 @@ TEST_F(SH_Tests, NonIntrusiveAnalysis) {
     auto class_NonIntrusive_SerializableWithoutFunction_Ptr = class_NonIntrusive_SerializableWithoutFunction.lock();
     auto class_NonIntrusive_TwoErrorsAtOnce_Ptr = class_NonIntrusive_TwoErrorsAtOnce.lock();
 
-    ASSERT_TRUE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_NonIntrusive_NoError_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_EQ(class_NonIntrusive_NoError_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_NonIntrusive_NoError_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_TRUE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_FALSE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_EQ(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_NonIntrusive_TaggedMemberNotSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_NonIntrusive_UntaggedMemberSeralized_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_NonIntrusive_UntaggedMemberSeralized_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 
-    ASSERT_TRUE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
-    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_SerializeMethodNotFound));
+    EXPECT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_NonIntrusive_SerializableWithoutFunction_Ptr->NumberOfErrors(), 1);
+    EXPECT_FALSE(class_NonIntrusive_SerializableWithoutFunction_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive)); // Since it does not exist, it is by nature not intrusive.
 
-    ASSERT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_NonIntrusive_TwoErrorsAtOnce_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_NonIntrusive_TwoErrorsAtOnce_Ptr->HasInfo(SerializationInfoFlag::Info_NonIntrusive));
 }
 
 TEST_F(SH_Tests, SplitAmpersandAnalysis) {
@@ -171,11 +199,11 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
 
-    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+    EXPECT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 10);
+    EXPECT_EQ(serializable_classes.size(), 10);
 
     auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Ampersand");
     auto class_Split_AllMembersSerialized_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Ampersand_NoMacro");
@@ -188,16 +216,16 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     auto class_Split_WrongOrder_TypeOk = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeOk_Ampersand");
     auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong_Ampersand");
 
-    ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
-    ASSERT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
-    ASSERT_FALSE(class_NonSplit_AllMembersSerialized_SplitMemberExists.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotLoaded.expired());
-    ASSERT_FALSE(class_Split_UnmarkedMemberSaved.expired());
-    ASSERT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded.expired());
-    ASSERT_FALSE(class_Split_WrongOrder_TypeOk.expired());
-    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
+    EXPECT_FALSE(class_Split_AllMembersSerialized.expired());
+    EXPECT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
+    EXPECT_FALSE(class_NonSplit_AllMembersSerialized_SplitMemberExists.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotSaved.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotLoaded.expired());
+    EXPECT_FALSE(class_Split_UnmarkedMemberSaved.expired());
+    EXPECT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded.expired());
+    EXPECT_FALSE(class_Split_WrongOrder_TypeOk.expired());
+    EXPECT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
 
     auto class_Split_AllMembersSerialized_Ptr = class_Split_AllMembersSerialized.lock();
     auto class_Split_AllMembersSerialized_NoMacro_Ptr = class_Split_AllMembersSerialized_NoMacro.lock();
@@ -210,32 +238,62 @@ TEST_F(SH_Tests, SplitAmpersandAnalysis) {
     auto class_Split_WrongOrder_TypeOk_Ptr = class_Split_WrongOrder_TypeOk.lock();
     auto class_Split_WrongOrder_TypeWrong_Ptr = class_Split_WrongOrder_TypeWrong.lock();
 
-    ASSERT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_AllMembersSerialized_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_AllMembersSerialized_NoMacro_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_FALSE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotSaved_NoMacro_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_NonSplit_AllMembersSerialized_SplitMemberExists_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_NonSplit_AllMembersSerialized_SplitMemberExists_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_NonSplit_AllMembersSerialized_SplitMemberExists_Ptr->NumberOfErrors(), 0);
+    EXPECT_FALSE(class_NonSplit_AllMembersSerialized_SplitMemberExists_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_FALSE(class_NonSplit_AllMembersSerialized_SplitMemberExists_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotSaved_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotLoaded_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
-    ASSERT_FALSE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    EXPECT_FALSE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_WrongOrder_TypeOk_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
-    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    EXPECT_FALSE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_WrongOrder_TypeWrong_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 }
 
 TEST_F(SH_Tests, SplitDirectionalAnalysis) {
@@ -244,11 +302,11 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     std::string code = GetCodeFromSourceFile(file);
     std::vector<std::string> args{"-E", std::string("-I/") + COMMON_DIR, "-x", "c++"};
 
-    ASSERT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
+    EXPECT_TRUE(clang::tooling::runToolOnCodeWithArgs(std::make_unique<FindSerializableClassAction>(), code, args, file));
 
     auto serializable_classes = SerializableClassInfoMediator::FlattenSerializableContainer();
 
-    ASSERT_EQ(serializable_classes.size(), 9);
+    EXPECT_EQ(serializable_classes.size(), 9);
 
     auto class_Split_AllMembersSerialized = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional");
     auto class_Split_AllMembersSerialized_NoMacro = GetClassFromVector(serializable_classes, "Split_AllMembersSerialized_Directional_NoMacro");
@@ -260,15 +318,15 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     auto class_Split_WrongOrder_TypeOk = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeOk_Directional");
     auto class_Split_WrongOrder_TypeWrong = GetClassFromVector(serializable_classes, "Split_WrongOrder_TypeWrong_Directional");
 
-    ASSERT_FALSE(class_Split_AllMembersSerialized.expired());
-    ASSERT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotSaved.expired());
-    ASSERT_FALSE(class_Split_OneMemberNotLoaded.expired());
-    ASSERT_FALSE(class_Split_UnmarkedMemberSaved.expired());
-    ASSERT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded.expired());
-    ASSERT_FALSE(class_Split_WrongOrder_TypeOk.expired());
-    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
+    EXPECT_FALSE(class_Split_AllMembersSerialized.expired());
+    EXPECT_FALSE(class_Split_AllMembersSerialized_NoMacro.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotSaved.expired());
+    EXPECT_FALSE(class_Split_OneMemberNotLoaded.expired());
+    EXPECT_FALSE(class_Split_UnmarkedMemberSaved.expired());
+    EXPECT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded.expired());
+    EXPECT_FALSE(class_Split_WrongOrder_TypeOk.expired());
+    EXPECT_FALSE(class_Split_WrongOrder_TypeWrong.expired());
 
     auto class_Split_AllMembersSerialized_Ptr = class_Split_AllMembersSerialized.lock();
     auto class_Split_AllMembersSerialized_NoMacro_Ptr = class_Split_AllMembersSerialized_NoMacro.lock();
@@ -280,37 +338,55 @@ TEST_F(SH_Tests, SplitDirectionalAnalysis) {
     auto class_Split_WrongOrder_TypeOk_Ptr = class_Split_WrongOrder_TypeOk.lock();
     auto class_Split_WrongOrder_TypeWrong_Ptr = class_Split_WrongOrder_TypeWrong.lock();
 
-    ASSERT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_AllMembersSerialized_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_AllMembersSerialized_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_AllMembersSerialized_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_AllMembersSerialized_NoMacro_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_AllMembersSerialized_NoMacro_Ptr->NumberOfErrors(), 0);
+    EXPECT_TRUE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_FALSE(class_Split_AllMembersSerialized_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_OneMemberNotSaved_NoMacro_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotSaved_NoMacro_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_NoMacro_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_OneMemberNotSaved_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotSaved_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotSaved_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_OneMemberNotSaved_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_OneMemberNotLoaded_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_OneMemberNotLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_OneMemberNotLoaded_Ptr->NumberOfErrors(), 1);
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_OneMemberNotLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
-    ASSERT_FALSE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_UnmarkedFieldSerialized));
+    EXPECT_FALSE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_UnmarkedMemberSavedAndLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
-    ASSERT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_MarkedFieldNotSerialized));
+    EXPECT_FALSE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->NumberOfErrors(), 2);
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_MarkedMemberNotSavedOrLoaded_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
-    ASSERT_FALSE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_WrongOrder_TypeOk_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    EXPECT_FALSE(class_Split_WrongOrder_TypeOk_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_WrongOrder_TypeOk_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeOk_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 
-    ASSERT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
-    ASSERT_FALSE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_NoError));
-    ASSERT_EQ(class_Split_WrongOrder_TypeWrong_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_SaveLoadOrderMismatched));
+    EXPECT_FALSE(class_Split_WrongOrder_TypeWrong_Ptr->HasError(SerializationErrorFlag::Error_NoError));
+    EXPECT_EQ(class_Split_WrongOrder_TypeWrong_Ptr->NumberOfErrors(), 2); // Ideally this should just be 1 error, but that will need work.
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization));
+    EXPECT_TRUE(class_Split_WrongOrder_TypeWrong_Ptr->HasInfo(SerializationInfoFlag::Info_UsesSplitMacro));
 }

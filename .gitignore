@@ -36,3 +36,6 @@
 build/
 output/
 .vscode/
+
+# Random save files
+*.txt

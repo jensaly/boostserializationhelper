@@ -47,4 +47,4 @@ target_link_libraries(sh_lib PUBLIC common clangTooling clangBasic clangASTMatch
 
 target_include_directories(sh_lib SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/common)
 
-target_compile_options(sh_lib PRIVATE -fno-limit-debug-info -Wall -Wextra -Wpedantic)
+target_compile_options(sh_lib PRIVATE -fno-limit-debug-info)

@@ -55,7 +55,7 @@ public:
 
     void SetInfo(SerializationInfoFlag info);
 
-    void SetInfo(std::unique_ptr<SerializationInfoFlag>&& info);
+    void UnsetInfo(SerializationInfoFlag info);
 
     bool HasInfo(SerializationInfoFlag error) const;
 

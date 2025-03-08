@@ -42,14 +42,30 @@ enum class SerializationInfoFlag : uint64_t {
     Info_UsesSplitMacro = 1 << 3, // Uses macro for splitting, instead of serialize template.
 };
 
-inline SerializationErrorFlag operator|(SerializationErrorFlag lhs, SerializationErrorFlag rhs) {
-    return static_cast<SerializationErrorFlag>(
-        static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs)
-    );
+constexpr SerializationInfoFlag operator|(SerializationInfoFlag lhs, SerializationInfoFlag rhs) {
+    return static_cast<SerializationInfoFlag>(static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs));
 }
 
-inline SerializationInfoFlag operator|(SerializationInfoFlag lhs, SerializationInfoFlag rhs) {
-    return static_cast<SerializationInfoFlag>(
+constexpr SerializationInfoFlag operator&(SerializationInfoFlag lhs, SerializationInfoFlag rhs) {
+    return static_cast<SerializationInfoFlag>(static_cast<uint64_t>(lhs) & static_cast<uint64_t>(rhs));
+}
+
+constexpr SerializationInfoFlag operator~(SerializationInfoFlag flag) {
+    return static_cast<SerializationInfoFlag>(~static_cast<uint64_t>(flag));
+}
+
+constexpr SerializationInfoFlag& operator|=(SerializationInfoFlag& lhs, SerializationInfoFlag rhs) {
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+constexpr SerializationInfoFlag& operator&=(SerializationInfoFlag& lhs, SerializationInfoFlag rhs) {
+    lhs = lhs & rhs;
+    return lhs;
+}
+
+inline SerializationErrorFlag operator|(SerializationErrorFlag lhs, SerializationErrorFlag rhs) {
+    return static_cast<SerializationErrorFlag>(
         static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs)
     );
 }
@@ -74,7 +90,7 @@ public:
 
     // Used to create errors noe tied to a specific location
     SerializationError(SerializationErrorFlag flag, SerializableClassInfoPtr& owningClass)
-            : m_flag{flag}, m_class{owningClass} {}
+            : m_class{owningClass}, m_flag{flag} {}
 
     virtual ~SerializationError() {}
     
@@ -154,4 +170,22 @@ public:
     SerializationError_SerializeMethodNotFound(SerializableClassInfoPtr owningClass);
 
     ~SerializationError_SerializeMethodNotFound() override = default;
+};
+
+class SerializationInfo {
+protected:
+    SerializableClassInfoWeakPtr m_class;
+public:
+    SerializationInfoFlag m_flag = SerializationInfoFlag::Info_NoInfo;
+    SerializationInfo() = default;
+
+    // Used to create errors noe tied to a specific location
+    SerializationInfo(SerializationInfoFlag flag, SerializableClassInfoPtr& owningClass)
+            : m_flag{flag}, m_class{owningClass} {}
+
+    virtual ~SerializationInfo() {}
+    
+    SerializationInfoFlag GetFlag() const { return m_flag; }
+
+    virtual void ToString(std::vector<std::string>& output) const = 0;
 };

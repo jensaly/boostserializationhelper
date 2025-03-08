@@ -63,16 +63,20 @@ bool SerializableClassInfo::HasError(SerializationErrorFlag error) const {
 }
 
 void SerializableClassInfo::SetInfo(SerializationInfoFlag info) {
-    //m_infoFlags |= info;
+    m_infoFlags |= info;
 }
 
-void SerializableClassInfo::SetInfo(std::unique_ptr<SerializationInfoFlag>&& info) {
-    //SetError(info->m_flag);
-    //m_info.push_back(std::move(info));
+void SerializableClassInfo::UnsetInfo(SerializationInfoFlag info) {
+    m_infoFlags &= ~info;
 }
 
-bool SerializableClassInfo::HasInfo(SerializationInfoFlag error) const {
-    return false;
+bool SerializableClassInfo::HasInfo(SerializationInfoFlag info) const {
+    if (info != SerializationInfoFlag::Info_NoInfo) {
+        return (m_infoFlags & info) != SerializationInfoFlag::Info_NoInfo;
+    }
+    else {
+        return m_infoFlags == info;
+    }
 }
 
 size_t SerializableClassInfo::NumberOfErrors() const {
@@ -87,6 +91,11 @@ void SerializableClassInfo::RunSerializeMethodAnalysis() {
     SerializationErrorFlag error = SerializationErrorFlag::Error_NoError;
 
     if (m_methodInfo == nullptr) {
+        // May previously have assumed non-intrusive. However, if the class still has no serialize-method, it does not exist.
+        // Unset the non-intrusive.
+        if (HasInfo(SerializationInfoFlag::Info_NonIntrusive)) {
+            UnsetInfo(SerializationInfoFlag::Info_NonIntrusive);
+        }
         auto error = std::make_unique<SerializationError_SerializeMethodNotFound>(shared_from_this());
         SetError(std::move(error));
         return;

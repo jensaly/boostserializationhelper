@@ -101,7 +101,8 @@ void DiscoveryHelper::FetchSerializableMembers(clang::ASTContext& context, const
     return;
 }
 
-void FindNonIntrusiveMethod(FunctionTemplateDecl*& serialize, const CXXRecordDecl* serializable) {
+// TODO: Isn't this finding intrusive?
+void FindIntrusiveMethod(FunctionTemplateDecl*& serialize, const CXXRecordDecl* serializable) {
     auto decls = serializable->decls();
 
     auto serialize_it = std::find_if(decls.begin(), decls.end(), [](const Decl* decl){
@@ -207,12 +208,13 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
     // If not found, assume non-intrusively split and move on.
 
     FunctionTemplateDecl* serialize;
-    FindNonIntrusiveMethod(serialize, serializableClass);
+    FindIntrusiveMethod(serialize, serializableClass);
 
     if (serialize == nullptr) {
         // No serialize function found. It may therefore be:
         // - Non-intrusively serialized.
         // - Missing (which should be caught by the compiler?)
+        classInfo->SetInfo(SerializationInfoFlag::Info_NonIntrusive);
         return false;
     }
 
@@ -221,6 +223,8 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
         // This is the case, so immediately find and parse the save/load methods.
         ISerializeFunctionInfoPtr splitMethodInfo = ParseSplitSerializationFunctionBodies(context, serializableClass);
         classInfo->SetSerializeMethodInfo(splitMethodInfo);
+        classInfo->SetInfo(SerializationInfoFlag::Info_UsesSplitMacro);
+        classInfo->SetInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization);
         return true;
     }
     
@@ -232,6 +236,7 @@ bool DiscoveryHelper::FetchSerializeMethod(clang::ASTContext& context, const CXX
         // If so, parse the find and parse the save/load methods.
         ISerializeFunctionInfoPtr splitmethodInfo = ParseSplitSerializationFunctionBodies(context, serializableClass);
         classInfo->SetSerializeMethodInfo(splitmethodInfo);
+        classInfo->SetInfo(SerializationInfoFlag::Info_SplitIntrusiveSerialization);
         return true;
     }
     // If we are here, the function is actually just normal. We found the non-intrusive, the class had
