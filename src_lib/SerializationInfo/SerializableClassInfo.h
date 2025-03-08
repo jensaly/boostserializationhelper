@@ -25,13 +25,15 @@
 
 class SerializableClassInfo : public SerializationObject, public std::enable_shared_from_this<SerializableClassInfo> {
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError; // Just the error flags set for the object. A summrary.
-    SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
+    SerializationInfoFlag m_infoFlags = SerializationInfoFlag::Info_NoInfo;
 
     std::vector<std::shared_ptr<SerializableFieldInfo>> m_fields; // Serializable fields inside of the class
 
     std::shared_ptr<ISerializeFunctionInfo> m_methodInfo = nullptr; // Pointer to its serialize-function information
 
     std::vector<std::unique_ptr<SerializationError>> m_errors;
+
+    //std::vector<std::unique_ptr<SerializationInfo>> m_info;
 
 public:
     SerializationErrorFlag GetErrors() const { return m_errorFlags; }
@@ -50,6 +52,12 @@ public:
     void SetError(std::unique_ptr<SerializationError>&& error);
 
     bool HasError(SerializationErrorFlag error) const;
+
+    void SetInfo(SerializationInfoFlag info);
+
+    void SetInfo(std::unique_ptr<SerializationInfoFlag>&& info);
+
+    bool HasInfo(SerializationInfoFlag error) const;
 
     size_t NumberOfErrors() const;
 

@@ -179,6 +179,7 @@ bool SerializableStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 }
 
 bool SerializableStmtVisitor::VisitCallExpr(const CallExpr* Call) {
+    constexpr std::string_view boostSplitMacroName = "split_member";
     if (const UnresolvedLookupExpr *ULE = dyn_cast<UnresolvedLookupExpr>(Call->getCallee()->IgnoreImplicit())) {
         if (ULE->getName().getAsString() == "split_member") {
             // llvm::outs() << "Found boost::serialization::split_member inside function!\n";
@@ -214,9 +215,10 @@ bool SaveStmtVisitor::VisitBinaryOperator(const BinaryOperator *op) {
 
 void SplitMemberMacro::MacroExpands(const clang::Token &MacroNameTok, const clang::MacroDefinition &MD,
                 clang::SourceRange Range, const clang::MacroArgs *Args) {
+    constexpr std::string_view boostSplitMacroName = "BOOST_SERIALIZATION_SPLIT_MEMBER";
     std::string MacroName = MacroNameTok.getIdentifierInfo()->getName().str();
     
-    if (MacroName == "BOOST_SERIALIZATION_SPLIT_MEMBER") {
+    if (MacroName == boostSplitMacroName) {
         clang::SourceLocation ExpansionLoc = Range.getBegin();
         //llvm::errs() << "Detected macro expansion: " << MacroName << " at " << ExpansionLoc.printToString(PP.getSourceManager()) << "\n";
 

@@ -30,7 +30,7 @@ public:
 
 class SerializeFunctionInfo : public ISerializeFunctionInfo, public SerializationObject {
     SerializationErrorFlag m_errorFlags = SerializationErrorFlag::Error_NoError;
-    SerializationInfoFlags m_info = SerializationInfoFlags::Info_NoInfo;
+    SerializationInfoFlag m_info = SerializationInfoFlag::Info_NoInfo;
 
     clang::FunctionDecl* m_decl = nullptr;
     

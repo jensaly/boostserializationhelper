@@ -34,14 +34,22 @@ enum class SerializationErrorFlag : uint64_t {
 
 std::string toStringSep(SerializationErrorFlag flag);
 
-enum class SerializationInfoFlags : uint64_t {
+enum class SerializationInfoFlag : uint64_t {
     Info_NoInfo = 0,
     Info_NonIntrusive = 1 << 0, // The class's serialization functionality is non-intrusive.
-    Info_SplitSerialization = 1 << 1, // The class uses a split save/load
+    Info_SplitIntrusiveSerialization = 1 << 1, // The class uses a split save/load
+    Info_SplitNonIntrusiveSerialization = 1 << 2, // Non-intrusive save/load
+    Info_UsesSplitMacro = 1 << 3, // Uses macro for splitting, instead of serialize template.
 };
 
 inline SerializationErrorFlag operator|(SerializationErrorFlag lhs, SerializationErrorFlag rhs) {
     return static_cast<SerializationErrorFlag>(
+        static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs)
+    );
+}
+
+inline SerializationInfoFlag operator|(SerializationInfoFlag lhs, SerializationInfoFlag rhs) {
+    return static_cast<SerializationInfoFlag>(
         static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs)
     );
 }

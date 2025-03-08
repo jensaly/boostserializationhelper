@@ -39,7 +39,7 @@ struct SERIALIZABLE Split_AllMembersSerialized_Directional {
         ar >> m_c;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    BOOST_SERIALIZATION_SPLIT_MEMBER() // This comment tests vulnerability
 };
 
 // Serialization is ok, class does not use macro for discovery
@@ -130,7 +130,7 @@ struct SERIALIZABLE Split_OneMemberNotSaved_Directional {
         ar >> m_c;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    BOOST_SERIALIZATION_SPLIT_MEMBER() // This comment tests vulnerability
 };
 
 struct SERIALIZABLE Split_OneMemberNotLoaded_Directional {

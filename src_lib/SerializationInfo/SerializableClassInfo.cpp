@@ -62,6 +62,19 @@ bool SerializableClassInfo::HasError(SerializationErrorFlag error) const {
     }
 }
 
+void SerializableClassInfo::SetInfo(SerializationInfoFlag info) {
+    //m_infoFlags |= info;
+}
+
+void SerializableClassInfo::SetInfo(std::unique_ptr<SerializationInfoFlag>&& info) {
+    //SetError(info->m_flag);
+    //m_info.push_back(std::move(info));
+}
+
+bool SerializableClassInfo::HasInfo(SerializationInfoFlag error) const {
+    return false;
+}
+
 size_t SerializableClassInfo::NumberOfErrors() const {
     return m_errors.size();
 }

@@ -70,6 +70,31 @@ struct SERIALIZABLE Split_AllMembersSerialized_Ampersand_NoMacro {
     }
 };
 
+// Serialization is ok, class does not use macro for discovery
+// The class does not have split serialization, however the serialize
+// -method calls a local function calls split_member not part of the
+// boost namespace This occurs when the user is being a prick, but we
+// need to cover for it anyway.
+struct SERIALIZABLE NonSplit_AllMembersSerialized_SplitMemberExists {
+    SERIALIZABLE int m_a = 1;
+    SERIALIZABLE float m_b = 1.;
+    SERIALIZABLE char m_c = 'c';
+
+    NonSplit_AllMembersSerialized_SplitMemberExists(int a, float b, char c) : m_a{a}, m_b{b}, m_c{c} {}
+
+    NonSplit_AllMembersSerialized_SplitMemberExists() = default;
+
+    void split_member(int a) { m_a = m_a + a; }
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int file_version ){
+        ar & m_a;
+        ar & m_b;
+        ar & m_c;
+        split_member(m_a);
+    }
+};
+
 // Order of elements in save/load are correct, but a marked member is not serialized
 // Single regression test for the case without a macro
 struct SERIALIZABLE Split_OneMemberNotSaved_Ampersand_NoMacro {
